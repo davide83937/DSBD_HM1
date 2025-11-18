@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+service UserService{
+  rpc registraUtente(UserRequestRegistration) returns (UserRequest);
+  rpc loginUtente(UserRequest) returns (UserResponse);
+  rpc cancellaUtente(UserRequest) returns (UserResponse);
+}
+
+message UserRequestRegistration{
+  string user = 1;
+  string email = 2;
+  string password = 3;
+}
+
+message UserRequest{
+  string email = 1;
+  string password = 2;
+}
+
+message UserResponse {
+  int32 status = 1;
+  string message = 2; // Status code: 0 = success, 1 = error
+}
