@@ -42,6 +42,7 @@ class dataManager():
            cursor.execute(insert_query, (aeroporto, codice_volo, aeroporto_finale, partenza_dt, arrivo_dt))
 
        conn.commit()
+
        cursor.close()
        conn.close()
 
