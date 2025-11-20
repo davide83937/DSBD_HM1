@@ -4,8 +4,9 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
       <excludeFolder url="file://$MODULE_DIR$/DataCollectorMicroservice/.venv" />
+      <excludeFolder url="file://$MODULE_DIR$/UserManagerMicroservice/.venv" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.12 virtualenv at D:\Desktop\Universita\Magistrale\DISTRIBUTED SYSTEMS AND BIG DATA\HOMEWORK\DSBD_HM1\DataCollectorMicroservice\.venv" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.12 (DSBD_HM1)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PyDocumentationSettings">
