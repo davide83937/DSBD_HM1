@@ -1,15 +1,48 @@
 from opensky_api import OpenSkyApi
 from datetime import datetime
+import requests
 
 # NOTA: Per l'API OpenSky, l'ora inserita dall'utente DEVE essere intesa come UTC
 # per evitare errori nei risultati, anche se qui non viene forzata esplicitamente.
 
 # --- INPUT INTERATTIVO ---
+# --- CONFIGURAZIONE ---
+CLIENT_ID = "davidepanto@gmail.com-api-client"
+CLIENT_SECRET = "ewpHTQ27KoTGv4vMoCyLT8QrIt4sLr3z"
+AIRPORT = "LICC"
+
+# --- FUNZIONI ---
+def get_token(client_id, client_secret):
+    """Ottieni token Bearer da OpenSky"""
+    url = "https://auth.opensky-network.org/auth/realms/opensky-network/protocol/openid-connect/token"
+    data = {
+        "grant_type": "client_credentials",
+        "client_id": client_id,
+        "client_secret": client_secret
+    }
+    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+    resp = requests.post(url, data=data, headers=headers)
+    resp.raise_for_status()
+    return resp.json()["access_token"]
 
 
-def get_data(icao_code, start_str):
-   print("--- Inserimento Dati Volo ---")
-   icao_code =icao_code.strip().upper() #input("Inserisci l'identificativo ICAO dell'aeroporto (es. EDDF): ").strip().upper()
+
+def get_info_flight(token, airport, begin_ts, end_ts, type):
+    """Recupera arrivi dall'API OpenSky per un intervallo"""
+    url = f"https://opensky-network.org/api/flights/{type}?airport={airport}&begin={begin_ts}&end={end_ts}"
+    headers = {"Authorization": f"Bearer {token}"}
+    resp = requests.get(url, headers=headers)
+    if resp.status_code == 200:
+        return resp.json()
+    elif resp.status_code == 404:
+        return []  # nessun volo in questo intervallo
+    else:
+        raise Exception(f"Errore {resp.status_code}: {resp.text}")
+
+
+
+def get_data(start_str):
+   #icao_code =icao_code.strip().upper() #input("Inserisci l'identificativo ICAO dell'aeroporto (es. EDDF): ").strip().upper()
    start_str = start_str.strip() #input("Inserisci data e ora INIZIALE (Formato: YYYY-MM-DD HH:MM:SS): ").strip()
    end_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S") #input("Inserisci data e ora FINALE (Formato: YYYY-MM-DD HH:MM:SS): ").strip()
    print("----------------------------")
@@ -23,18 +56,18 @@ def get_data(icao_code, start_str):
        start_time = int(datetime.strptime(start_str, date_format).timestamp())
        end_time = int(datetime.strptime(end_str, date_format).timestamp())
        print(end_time)
-       return icao_code, start_time, end_time
+       return start_time, end_time
    except ValueError:
       print("\nERRORE: Formato data/ora non valido. Controlla il formato YYYY-MM-DD HH:MM:SS.")
       exit()
 
-# --- CHIAMATE API ORIGINALI ---
+
 
 
 
 
    #print(f"Recupero dati per {icao_code}...")
-def getArrives(api):
+"""def getArrives(api):
    lista = []
    # Metodi richiesti dalla documentazione
    icao_code, start_time, end_time = get_data("LIRF".strip().upper(), "2025-11-19 07:00:00".strip())
@@ -47,11 +80,11 @@ def getArrives(api):
         lista.append(flight)
    else:
       print("Nessun arrivo trovato.")
-   return lista
+   return lista"""
 
 
 
-def getDepartures(api):
+"""def getDepartures(api):
     lista = []
     icao_code, start_time, end_time = get_data("LIRF".strip().upper(), "2025-11-19 07:00:00".strip())
     departures = api.get_departures_by_airport(icao_code, start_time, end_time)
@@ -61,4 +94,4 @@ def getDepartures(api):
           lista.append(flight)
     else:
        print("Nessuna partenza trovata.")
-    return lista
+    return lista """

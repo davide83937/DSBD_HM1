@@ -1,5 +1,4 @@
 from datetime import datetime
-
 import mysql.connector
 from mysql.connector import cursor
 
@@ -14,26 +13,21 @@ class dataManager():
         password="onta",
         database="DataDB"
    )
-
       cursor = conn.cursor()
       cursor.execute("SELECT DATABASE();")
       print("Connesso al DB:", cursor.fetchone())
       return conn, cursor
 
-   def insertOnDatabase(self, lista):
-       insert_query = """
-         INSERT INTO Flight_Data (Airport, Flight_code, Final_Airport, Departure_Time, Arrive_Time)
-         VALUES (%s, %s, %s, %s, %s)
-         """
+
+   def insertOnDatabase(self, lista, table):
+       insert_query = f"INSERT INTO {table} (Airport, Flight_code, Final_Airport, Departure_Time, Arrive_Time) VALUES (%s, %s, %s, %s, %s)"
        conn, cursor =self.connect()
        for flight in lista:
-           data = flight.__dict__
-
-           aeroporto = data["estDepartureAirport"]
-           codice_volo = data["callsign"].strip()
-           aeroporto_finale = data["estArrivalAirport"]
-           partenza_ts = data["firstSeen"]
-           arrivo_ts = data["lastSeen"]
+           aeroporto = (flight.get("estDepartureAirport") or "").strip()
+           codice_volo = (flight.get("callsign") or "").strip()
+           aeroporto_finale = (flight.get("estArrivalAirport") or "").strip()
+           partenza_ts = flight.get("firstSeen")
+           arrivo_ts = flight.get("lastSeen")
 
            # conversione timestamp → datetime
            partenza_dt = datetime.fromtimestamp(partenza_ts)
