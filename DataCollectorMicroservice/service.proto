@@ -1,20 +1,27 @@
 syntax = "proto3";
 
 service UserService{
-  rpc registraUtente(UserRequestRegistration) returns (UserRequest);
-  rpc loginUtente(UserRequest) returns (UserResponse);
-  rpc cancellaUtente(UserRequest) returns (UserResponse);
+  rpc sendInterests(UserInterestsMessage) returns (UserResponse);
+  rpc getInfoByAirport(UserInterestsMessage) returns (FlightsInfo);
 }
 
-message UserRequestRegistration{
-  string user = 1;
-  string email = 2;
-  string password = 3;
-}
-
-message UserRequest{
+message UserInterestsMessage{
   string email = 1;
-  string password = 2;
+  string airport_code = 2;
+  bool mode = 3;
+}
+
+message FlightInfo{
+  string code_flight = 1;
+  string time_departure = 2;
+  string time_arrive = 3;
+  string code_airport_departure = 4;
+  string code_airport_arrive = 5;
+}
+
+message FlightsInfo{
+  int32 status = 1;
+  repeated FlightInfo info = 2;
 }
 
 message UserResponse {
