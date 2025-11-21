@@ -1,9 +1,9 @@
 from flask import Flask, request
-from jinja2.filters import async_select_or_reject
+from flask import Blueprint
 
 import DbManager as db
 
-app = Flask(__name__)
+app = Blueprint('app', __name__)
 
 """@app.route("/ciao", methods=["GET"])
 def hello():
@@ -72,4 +72,3 @@ def cancellazione():
 
 
 
-app.run(port=5000)
