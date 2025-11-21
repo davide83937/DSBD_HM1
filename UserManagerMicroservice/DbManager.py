@@ -1,5 +1,7 @@
 import mysql.connector
 from mysql.connector import cursor
+import random
+import string
 
 
 def connect():
@@ -46,15 +48,62 @@ def check_n(n):
     return 1
 
 
-def login(email, password):
+def cancellazione_sessione(email):
     conn = None
     cursor = None
     try:
-       login_query = f"SELECT * FROM Users WHERE email = '{email}' AND password = '{password}'"
-       conn, cursor = connect()
-       cursor.execute(login_query)
-       n = cursor.rowcount
-       return check_n(n)
+        query = "DELETE FROM Logged_Users WHERE email = %s"
+        conn, cursor = connect()
+        cursor.execute(query, (email,))
+        n = cursor.rowcount
+        return check_n(n)
+    except mysql.connector.DatabaseError as e:
+         print("Errore generico del database:", e)
+         return -1
+    finally:
+         if conn != None:
+             disconnect(conn, cursor)
+
+
+def check_logging(email):
+    conn = None
+    cursor = None
+    try:
+        check_login_query = "SELECT * FROM Logged_Users WHERE email = %s"
+        conn, cursor = connect()
+        cursor.execute(check_login_query, (email,))
+        n = cursor.rowcount
+        return check_n(n)
+    except mysql.connector.DatabaseError as e:
+        print("Errore generico del database:", e)
+        return -1
+    finally:
+        if conn != None:
+            disconnect(conn, cursor)
+
+
+def login(email, password, first):
+    conn = None
+    cursor = None
+    try:
+        if first == True:
+            if check_logging(email) == 0:
+               return 2
+        login_query = "SELECT * FROM Users WHERE email = %s AND password = %s"
+        conn, cursor = connect()
+        cursor.execute(login_query, (email, password))
+        n = cursor.rowcount
+        response = check_n(n)
+        if first == True:
+            if response == 0:
+                insert_session_id_query = "INSERT INTO Logged_Users (email, id_session) VALUES (%s, %s)"
+                length = 20
+                session_id = ''.join(random.choices(string.ascii_letters + string.digits, k=length))
+                cursor.execute(insert_session_id_query, (email,session_id))
+                n = cursor.rowcount
+                return check_n(n)
+        else:
+            return response
     except mysql.connector.DatabaseError as e:
         print("Errore generico del database:", e)
         return -1
