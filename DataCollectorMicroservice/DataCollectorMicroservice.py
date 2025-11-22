@@ -18,8 +18,9 @@ DEPARTURE = "departure"
 def sendInterest():
     data = request.json
     email = data["email"]
+    token = data["token"]
     stub = grpc_manager.get_stub()
-    response = stub.checkUser(service_pb2.UserCheckMessage(email=email))
+    response = stub.checkUser(service_pb2.UserCheckMessage(email=email, token=token))
     if response.status == 0:
         airport = data["airport_code"]
         mode = data["mode"]
@@ -36,8 +37,9 @@ def sendInterest():
 def delete_interest():
     data = request.json
     email = data["email"]
+    token = data["token"]
     stub = grpc_manager.get_stub()
-    response = stub.checkUser(service_pb2.UserCheckMessage(email=email))
+    response = stub.checkUser(service_pb2.UserCheckMessage(email=email, token=token))
     if response.status == 0:
         airport = data["airport_code"]
         mode = data["mode"]
@@ -53,8 +55,9 @@ def delete_interest():
 def get_info():
     data = request.json
     email = data["email"]
+    token = data["token"]
     stub = grpc_manager.get_stub()
-    response = stub.checkUser(service_pb2.UserCheckMessage(email=email))
+    response = stub.checkUser(service_pb2.UserCheckMessage(email=email, token=token))
     if response.status == 0:
         airport = data["airport_code"]
         mode = data["mode"]
@@ -84,8 +87,9 @@ def get_info():
 def get_last_one():
     data = request.json
     email = data["email"]
+    token = data["token"]
     stub = grpc_manager.get_stub()
-    response = stub.checkUser(service_pb2.UserCheckMessage(email=email))
+    response = stub.checkUser(service_pb2.UserCheckMessage(email=email, token=token))
     if response.status == 0:
         airport = data["airport_code"]
         last_arrival, last_departure = db.get_last_one(airport)
@@ -116,8 +120,9 @@ def get_last_one():
 def get_avgs():
     data = request.json
     email = data["email"]
+    token = data["token"]
     stub = grpc_manager.get_stub()
-    response = stub.checkUser(service_pb2.UserCheckMessage(email=email))
+    response = stub.checkUser(service_pb2.UserCheckMessage(email=email, token=token))
     if response.status == 0:
         airport = data["airport_code"]
         n_days = data["n_days"]

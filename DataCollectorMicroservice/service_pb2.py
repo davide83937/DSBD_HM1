@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rservice.proto\"!\n\x10UserCheckMessage\x12\r\n\x05\x65mail\x18\x01 \x01(\t\"I\n\x14UserInterestsMessage\x12\r\n\x05\x65mail\x18\x01 \x01(\t\x12\x14\n\x0c\x61irport_code\x18\x02 \x01(\t\x12\x0c\n\x04mode\x18\x03 \x01(\x08\"\x8b\x01\n\nFlightInfo\x12\x13\n\x0b\x63ode_flight\x18\x01 \x01(\t\x12\x16\n\x0etime_departure\x18\x02 \x01(\t\x12\x13\n\x0btime_arrive\x18\x03 \x01(\t\x12\x1e\n\x16\x63ode_airport_departure\x18\x04 \x01(\t\x12\x1b\n\x13\x63ode_airport_arrive\x18\x05 \x01(\t\"8\n\x0b\x46lightsInfo\x12\x0e\n\x06status\x18\x01 \x01(\x05\x12\x19\n\x04info\x18\x02 \x03(\x0b\x32\x0b.FlightInfo\"/\n\x0cUserResponse\x12\x0e\n\x06status\x18\x01 \x01(\x05\x12\x0f\n\x07message\x18\x02 \x01(\t2\xac\x01\n\x0bUserService\x12-\n\tcheckUser\x12\x11.UserCheckMessage\x1a\r.UserResponse\x12\x35\n\rsendInterests\x12\x15.UserInterestsMessage\x1a\r.UserResponse\x12\x37\n\x10getInfoByAirport\x12\x15.UserInterestsMessage\x1a\x0c.FlightsInfob\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rservice.proto\"0\n\x10UserCheckMessage\x12\r\n\x05\x65mail\x18\x01 \x01(\t\x12\r\n\x05token\x18\x02 \x01(\t\"/\n\x0cUserResponse\x12\x0e\n\x06status\x18\x01 \x01(\x05\x12\x0f\n\x07message\x18\x02 \x01(\t2<\n\x0bUserService\x12-\n\tcheckUser\x12\x11.UserCheckMessage\x1a\r.UserResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -32,15 +32,9 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'service_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
   _globals['_USERCHECKMESSAGE']._serialized_start=17
-  _globals['_USERCHECKMESSAGE']._serialized_end=50
-  _globals['_USERINTERESTSMESSAGE']._serialized_start=52
-  _globals['_USERINTERESTSMESSAGE']._serialized_end=125
-  _globals['_FLIGHTINFO']._serialized_start=128
-  _globals['_FLIGHTINFO']._serialized_end=267
-  _globals['_FLIGHTSINFO']._serialized_start=269
-  _globals['_FLIGHTSINFO']._serialized_end=325
-  _globals['_USERRESPONSE']._serialized_start=327
-  _globals['_USERRESPONSE']._serialized_end=374
-  _globals['_USERSERVICE']._serialized_start=377
-  _globals['_USERSERVICE']._serialized_end=549
+  _globals['_USERCHECKMESSAGE']._serialized_end=65
+  _globals['_USERRESPONSE']._serialized_start=67
+  _globals['_USERRESPONSE']._serialized_end=114
+  _globals['_USERSERVICE']._serialized_start=116
+  _globals['_USERSERVICE']._serialized_end=176
 # @@protoc_insertion_point(module_scope)

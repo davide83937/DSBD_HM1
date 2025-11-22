@@ -65,13 +65,13 @@ def cancellazione_sessione(email):
              disconnect(conn, cursor)
 
 
-def check_logging(email):
+def check_logging(email, token):
     conn = None
     cursor = None
     try:
-        check_login_query = "SELECT * FROM Logged_Users WHERE email = %s"
+        check_login_query = "SELECT * FROM Logged_Users WHERE email = %s AND id_session = %s"
         conn, cursor = connect()
-        cursor.execute(check_login_query, (email,))
+        cursor.execute(check_login_query, (email, token))
         n = cursor.rowcount
         return check_n(n)
     except mysql.connector.DatabaseError as e:

@@ -17,7 +17,8 @@ class Servicer(service_pb2_grpc.UserServiceServicer):
 
     def checkUser(self, request, context):
         email = request.email
-        response = db.check_logging(email)
+        token = request.token
+        response = db.check_logging(email, token)
         if response == 0:
             return service_pb2.UserResponse(
                 status=0,
