@@ -30,8 +30,6 @@ class Servicer(service_pb2_grpc.UserServiceServicer):
             )
 
 
-
-
 def serve():
     """
     Start the gRPC server and listen for incoming requests.
