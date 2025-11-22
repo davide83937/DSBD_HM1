@@ -1,4 +1,3 @@
-from http.client import responses
 from concurrent import futures
 
 import grpc
@@ -29,6 +28,8 @@ class Servicer(service_pb2_grpc.UserServiceServicer):
                 status=1,
                 message="Non so chi sia costui"
             )
+
+
 
 
 def serve():

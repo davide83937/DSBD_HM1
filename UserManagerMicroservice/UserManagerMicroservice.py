@@ -1,14 +1,8 @@
-from flask import Flask, request
+from flask import request
 from flask import Blueprint
-import grpc_methods
 import DbManager as db
 
 app = Blueprint('app', __name__)
-
-"""@app.route("/ciao", methods=["GET"])
-def hello():
-    return {"msg": "ciao dal server"}
-"""
 
 @app.route("/login", methods=["POST"])
 def login():

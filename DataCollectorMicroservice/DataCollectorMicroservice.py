@@ -1,12 +1,6 @@
-from opensky_api import OpenSkyApi
-import time
-import grpc
-import testCred
 import DatabaseManager as db
-from concurrent import futures
 import service_pb2
-import service_pb2_grpc
-from flask import Flask, request
+from flask import request
 from flask import Blueprint
 import grpc_manager
 
@@ -27,16 +21,13 @@ def sendInterest():
     if response.status == 0:
         airport = data["airport_code"]
         mode = data["mode"]
-        response = stub.sendInterests(
-            service_pb2.UserInterestsMessage(email=email, airport_code=airport, mode=mode)
-        )
-        if response.status == 0:
-            return {"message": "interessi inseriti correttamente"}, 200
+        response = db.insertInterests(email, airport, mode)
+        if response == 0:
+            return {"message": "Inserimento inserito"}
         else:
-            return {"message": "qualcosa è andato storto"}, 404
+            return {"message": "Inserimento non inserito"}
     else:
-        return {"message": "utente non loggato"}, 409
-
+        return {"message": "Utente non loggato"}
 
 
 
