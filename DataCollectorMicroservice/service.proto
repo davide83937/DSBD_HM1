@@ -1,8 +1,14 @@
 syntax = "proto3";
 
 service UserService{
+  rpc checkUser(UserCheckMessage) returns (UserResponse);
   rpc sendInterests(UserInterestsMessage) returns (UserResponse);
   rpc getInfoByAirport(UserInterestsMessage) returns (FlightsInfo);
+}
+
+
+message UserCheckMessage{
+  string email = 1;
 }
 
 message UserInterestsMessage{
@@ -10,6 +16,7 @@ message UserInterestsMessage{
   string airport_code = 2;
   bool mode = 3;
 }
+
 
 message FlightInfo{
   string code_flight = 1;

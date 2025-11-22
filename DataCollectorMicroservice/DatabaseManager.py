@@ -3,23 +3,48 @@ import mysql.connector
 from mysql.connector import cursor
 
 
-class dataManager():
+
 # Connessione al database
-   def connect(self):
-      conn = mysql.connector.connect(
+def connect(self):
+    conn = mysql.connector.connect(
         host="localhost",
         port=3306,
         user="anto",
         password="onta",
         database="DataDB"
-   )
-      cursor = conn.cursor()
-      cursor.execute("SELECT DATABASE();")
-      print("Connesso al DB:", cursor.fetchone())
-      return conn, cursor
+    )
+    cursor = conn.cursor()
+    cursor.execute("SELECT DATABASE();")
+    print("Connesso al DB:", cursor.fetchone())
+    return conn, cursor
+
+def disconnect(conn, cursor):
+    conn.commit()
+    cursor.close()
+    conn.close()
+    print("Connessione chiusa")
 
 
-   def insertOnDatabase(self, lista, table):
+def insertInterests(self, email, airport_code, mode):
+    try:
+
+       insert_query = f"INSERT INTO Interessi (email, airport, mode) VALUES (%s, %s, %s)"
+       conn, cursor = self.connect()
+       cursor.execute(insert_query, (email, airport_code, mode))
+       row = cursor.fetchone()
+       if row == None:
+           return 0
+       else:
+           return 1
+    except mysql.connector.DatabaseError as e:
+        print("Errore generico del database:", e)
+        return -1
+    finally:
+        if conn != None:
+           disconnect(conn, cursor)
+
+def insertOnDatabase(self, lista, table):
+    try:
        insert_query = f"INSERT INTO {table} (Airport, Flight_code, Final_Airport, Departure_Time, Arrive_Time) VALUES (%s, %s, %s, %s, %s)"
        conn, cursor =self.connect()
        for flight in lista:
@@ -39,6 +64,12 @@ class dataManager():
 
        cursor.close()
        conn.close()
+    except mysql.connector.DatabaseError as e:
+        print("Errore generico del database:", e)
+        return -1
+    finally:
+        if conn != None:
+           disconnect(conn, cursor)
 
 
 

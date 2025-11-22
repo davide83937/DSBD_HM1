@@ -1,6 +1,6 @@
 from flask import Flask, request
 from flask import Blueprint
-
+import grpc_methods
 import DbManager as db
 
 app = Blueprint('app', __name__)
@@ -28,6 +28,8 @@ def login():
             return {"message": "Qualcosa è andato storto"}, 409
     else:
         return {"message": "L'utente non esiste"}, 408
+
+
 
 
 @app.route("/registrazione", methods=["POST"])

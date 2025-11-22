@@ -6,6 +6,12 @@ from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
+class UserCheckMessage(_message.Message):
+    __slots__ = ("email",)
+    EMAIL_FIELD_NUMBER: _ClassVar[int]
+    email: str
+    def __init__(self, email: _Optional[str] = ...) -> None: ...
+
 class UserInterestsMessage(_message.Message):
     __slots__ = ("email", "airport_code", "mode")
     EMAIL_FIELD_NUMBER: _ClassVar[int]

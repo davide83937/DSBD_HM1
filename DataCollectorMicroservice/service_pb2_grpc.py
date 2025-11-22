@@ -34,6 +34,11 @@ class UserServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
+        self.checkUser = channel.unary_unary(
+                '/UserService/checkUser',
+                request_serializer=service__pb2.UserCheckMessage.SerializeToString,
+                response_deserializer=service__pb2.UserResponse.FromString,
+                _registered_method=True)
         self.sendInterests = channel.unary_unary(
                 '/UserService/sendInterests',
                 request_serializer=service__pb2.UserInterestsMessage.SerializeToString,
@@ -48,6 +53,12 @@ class UserServiceStub(object):
 
 class UserServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
+
+    def checkUser(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
     def sendInterests(self, request, context):
         """Missing associated documentation comment in .proto file."""
@@ -64,6 +75,11 @@ class UserServiceServicer(object):
 
 def add_UserServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
+            'checkUser': grpc.unary_unary_rpc_method_handler(
+                    servicer.checkUser,
+                    request_deserializer=service__pb2.UserCheckMessage.FromString,
+                    response_serializer=service__pb2.UserResponse.SerializeToString,
+            ),
             'sendInterests': grpc.unary_unary_rpc_method_handler(
                     servicer.sendInterests,
                     request_deserializer=service__pb2.UserInterestsMessage.FromString,
@@ -84,6 +100,33 @@ def add_UserServiceServicer_to_server(servicer, server):
  # This class is part of an EXPERIMENTAL API.
 class UserService(object):
     """Missing associated documentation comment in .proto file."""
+
+    @staticmethod
+    def checkUser(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/UserService/checkUser',
+            service__pb2.UserCheckMessage.SerializeToString,
+            service__pb2.UserResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
 
     @staticmethod
     def sendInterests(request,
