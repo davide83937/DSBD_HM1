@@ -34,14 +34,13 @@ def registrazione():
     password = data["password"]
     response = db.check_user(email)
     if response == 0:
-        #print("Possiamo procedere con la registrazione")
         response = db.registrazione(email, username, password)
         if response == 0:
             return {"message": "Registrazione andata a buon fine"}, 200
         else:
             return {"message": "Qualcosa è andato storto"}, 404
     else:
-        return {"message": "utente già registrato"}, 409
+        return {"message": "Utente già registrato"}, 409
 
 
 @app.route("/cancellazione", methods=["POST"])
@@ -51,7 +50,6 @@ def cancellazione():
     password = data["password"]
     response = db.check_user(email)
     if response == 1:
-        #print("Possiamo procedere con la cancellazione")
         response = db.login(email, password, False)
         if response == 0:
            response = db.cancellazione(email)

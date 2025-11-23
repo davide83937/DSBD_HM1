@@ -1,5 +1,4 @@
 import mysql.connector
-from mysql.connector import cursor
 import random
 import string
 
@@ -23,16 +22,26 @@ def disconnect(conn, cursor):
     conn.close()
     print("Connessione chiusa")
 
+def check_n(n):
+  if n == 1:
+     return 0
+  else:
+    return 1
+
+def check_row(row):
+    if row == None:
+        return 0
+    else:
+        return 1
+
+
 def check_user(email):
     try:
        check_query = f"SELECT * FROM Users WHERE email = '{email}'"
        conn, cursor = connect()
        cursor.execute(check_query)
        row = cursor.fetchone()
-       if row == None:
-           return 0
-       else:
-           return 1
+       return check_row(row)
     except mysql.connector.DatabaseError as e:
         print("Errore generico del database:", e)
         return -1
@@ -41,11 +50,6 @@ def check_user(email):
           disconnect(conn, cursor)
 
 
-def check_n(n):
-  if n == 1:
-     return 0
-  else:
-    return 1
 
 
 def cancellazione_sessione(email):
@@ -70,6 +74,8 @@ def check_logging(email, token):
     cursor = None
     try:
         check_login_query = "SELECT * FROM Logged_Users WHERE email = %s AND id_session = %s"
+        if token == "":
+            check_login_query = "SELECT * FROM Logged_Users WHERE email = %s"
         conn, cursor = connect()
         cursor.execute(check_login_query, (email, token))
         n = cursor.rowcount
@@ -87,7 +93,7 @@ def login(email, password, first):
     cursor = None
     try:
         if first == True:
-            if check_logging(email) == 0:
+            if check_logging(email, "") == 0:
                return 2
         login_query = "SELECT * FROM Users WHERE email = %s AND password = %s"
         conn, cursor = connect()

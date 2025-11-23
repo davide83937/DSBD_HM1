@@ -1,16 +1,13 @@
 import DatabaseManager as db
 import service_pb2
-from flask import request, jsonify
+from flask import request
 from flask import Blueprint
 import grpc_manager
-import testCred
-
 
 app = Blueprint('app', __name__)
 
 CLIENT_ID = "davidepanto@gmail.com-api-client"
 CLIENT_SECRET = "ewpHTQ27KoTGv4vMoCyLT8QrIt4sLr3z"
-AIRPORT = "LIRF"
 ARRIVAL = "arrival"
 DEPARTURE = "departure"
 
@@ -51,6 +48,8 @@ def delete_interest():
     else:
         return {"message": "Utente non loggato"}, 409
 
+
+
 @app.route("/get_info", methods=["POST"])
 def get_info():
     data = request.json
@@ -71,15 +70,11 @@ def get_info():
                 "arrivo": str(riga[3]),
                 "codice": str(riga[4])
             })
-
-        # 2. Restituiamo il JSON con status 200 (OK)
         return {
             "count": len(lista_voli_json),
             "voli": lista_voli_json
         }, 200
-
     else:
-        # Se l'utente non è loggato
         return {"message": "Utente non autorizzato o non loggato"}, 401
 
 
@@ -99,22 +94,19 @@ def get_last_one():
             if riga is None:
                 continue
             lista_voli_json.append({
-                "partenza": riga[0],  # Assumo indice 0 = Airport
-                "ora_arrivo": riga[1],  # Assumo indice 1 = Flight_code
-                "ora_partenza": riga[2],  # Assumo indice 2 = Final_Airport
-                "arrivo": str(riga[3]),  # Convertiamo datetime in stringa
+                "partenza": riga[0],
+                "ora_arrivo": riga[1],
+                "ora_partenza": riga[2],
+                "arrivo": str(riga[3]),
                 "codice": str(riga[4])
             })
-
-        # 2. Restituiamo il JSON con status 200 (OK)
         return {
             "count": len(lista_voli_json),
             "voli": lista_voli_json
         }, 200
-
     else:
-        # Se l'utente non è loggato
         return {"message": "Utente non autorizzato o non loggato"}, 401
+
 
 @app.route("/get_avgs", methods=["POST"])
 def get_avgs():
@@ -131,34 +123,9 @@ def get_avgs():
             "media arrivi": arrival_avg,
             "media partenze": departure_avg
         }, 200
-
     else:
-        # Se l'utente non è loggato
         return {"message": "Utente non autorizzato o non loggato"}, 401
 
-#api = OpenSkyApi()
-
-"""token = testCred.get_token(CLIENT_ID, CLIENT_SECRET)
-
-lista_arrivi = []
-start_time, end_time = testCred.get_data("2025-11-21 18:00:00".strip())
-lista_arrivi.extend(testCred.get_info_flight(token, AIRPORT, start_time, end_time, ARRIVAL))
-print("LISTA ARRIVI --------------------------------------------------------------------------------")
-print(lista_arrivi)
-print("--------------------------------------------------------------------------------------------")"""
-
-#db.insertOnDatabase(lista_arrivi, "Flight_Data_Arrives")
-"""
-lista_partenze = []
-start_time, end_time = testCred.get_data("2025-11-21 12:00:00".strip())
-lista_partenze.extend(testCred.get_info_flight(token, AIRPORT, start_time, end_time, DEPARTURE))
-print("LISTA PARTENZE --------------------------------------------------------------------------------")
-print(lista_partenze)
-print("--------------------------------------------------------------------------------------------")
-
-
-#db.insertOnDatabase(lista_partenze, "Flight_Data_Departures")
-"""
 
 
 

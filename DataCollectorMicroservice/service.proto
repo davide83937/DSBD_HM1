@@ -13,5 +13,5 @@ message UserCheckMessage{
 
 message UserResponse {
   int32 status = 1;
-  string message = 2; // Status code: 0 = success, 1 = error
+  string message = 2;
 }

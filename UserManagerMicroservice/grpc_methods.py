@@ -32,29 +32,16 @@ class Servicer(service_pb2_grpc.UserServiceServicer):
 
 
 def serve():
-    """
-    Start the gRPC server and listen for incoming requests.
-    Server runs on port 50051.
-    """
-    # Create a gRPC server with thread pool
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-
-    # Register our service implementation
     service_pb2_grpc.add_UserServiceServicer_to_server(
         Servicer(), server
     )
-
-    # Listen on port 50051
     port = "50051"
     server.add_insecure_port(f"[::]:{port}")
-
-    # Start the server
     server.start()
-    print(f"Server started on port {port}")
-    print("Waiting for client requests...")
+    print(f"Server avviato sulla porta {port}")
+    print("In attesa di client request...")
     print("")
-
-    # Keep server running
     server.wait_for_termination()
 
 
