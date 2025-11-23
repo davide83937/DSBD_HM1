@@ -1,8 +1,12 @@
+import hashlib
 from flask import request
 from flask import Blueprint
 import DbManager as db
 
 app = Blueprint('app', __name__)
+
+def sha512_hash(s: str) -> str:
+    return hashlib.sha512(s.encode()).hexdigest()
 
 @app.route("/login", methods=["POST"])
 def login():
