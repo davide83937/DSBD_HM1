@@ -12,9 +12,6 @@ def get_stub():
 
 
 class Servicer(service_pb2_grpc.UserServiceServicer):
-    def __init__(self):
-        print("Ci siamo")
-
     def checkUser(self, request, context):
         email = request.email
         token = request.token
