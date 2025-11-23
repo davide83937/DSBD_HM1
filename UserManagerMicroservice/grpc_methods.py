@@ -1,14 +1,8 @@
 from concurrent import futures
-
 import grpc
 import service_pb2
 import service_pb2_grpc
 import DbManager as db
-
-def get_stub():
-    channel = grpc.insecure_channel('server:50051')
-    stub = service_pb2_grpc.UserServiceStub(channel)
-    return stub
 
 
 class Servicer(service_pb2_grpc.UserServiceServicer):
