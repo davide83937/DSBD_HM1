@@ -24,17 +24,19 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rservice.proto\"0\n\x10UserCheckMessage\x12\r\n\x05\x65mail\x18\x01 \x01(\t\x12\r\n\x05token\x18\x02 \x01(\t\"/\n\x0cUserResponse\x12\x0e\n\x06status\x18\x01 \x01(\x05\x12\x0f\n\x07message\x18\x02 \x01(\t2<\n\x0bUserService\x12-\n\tcheckUser\x12\x11.UserCheckMessage\x1a\r.UserResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rservice.proto\"!\n\x10SendEmailMessage\x12\r\n\x05\x65mail\x18\x01 \x01(\t\"0\n\x10UserCheckMessage\x12\r\n\x05\x65mail\x18\x01 \x01(\t\x12\r\n\x05token\x18\x02 \x01(\t\"/\n\x0cUserResponse\x12\x0e\n\x06status\x18\x01 \x01(\x05\x12\x0f\n\x07message\x18\x02 \x01(\t2|\n\x0bUserService\x12-\n\tcheckUser\x12\x11.UserCheckMessage\x1a\r.UserResponse\x12>\n\x1a\x64\x65lete_interestes_by_email\x12\x11.SendEmailMessage\x1a\r.UserResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'service_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
-  _globals['_USERCHECKMESSAGE']._serialized_start=17
-  _globals['_USERCHECKMESSAGE']._serialized_end=65
-  _globals['_USERRESPONSE']._serialized_start=67
-  _globals['_USERRESPONSE']._serialized_end=114
-  _globals['_USERSERVICE']._serialized_start=116
-  _globals['_USERSERVICE']._serialized_end=176
+  _globals['_SENDEMAILMESSAGE']._serialized_start=17
+  _globals['_SENDEMAILMESSAGE']._serialized_end=50
+  _globals['_USERCHECKMESSAGE']._serialized_start=52
+  _globals['_USERCHECKMESSAGE']._serialized_end=100
+  _globals['_USERRESPONSE']._serialized_start=102
+  _globals['_USERRESPONSE']._serialized_end=149
+  _globals['_USERSERVICE']._serialized_start=151
+  _globals['_USERSERVICE']._serialized_end=275
 # @@protoc_insertion_point(module_scope)

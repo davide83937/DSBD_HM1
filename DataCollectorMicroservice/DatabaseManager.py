@@ -91,11 +91,15 @@ def deleteInterest(email, airport_code, mode):
     conn = None
     cursor = None
     try:
-        delete_query = "DELETE FROM Interessi WHERE email = %s AND airport = %s AND mode = %s"
-        conn, cursor = connect()  # Usa connect() se non hai 'self'
-        cursor.execute(delete_query, (email, airport_code, mode))
+        delete_query = ""
+        conn, cursor = connect()
+        if(airport_code == ""):
+            delete_query = "DELETE FROM Interessi WHERE email = %s"
+            cursor.execute(delete_query, (email,))
+        else:
+            delete_query = "DELETE FROM Interessi WHERE email = %s AND airport = %s AND mode = %s"
+            cursor.execute(delete_query, (email, airport_code, mode))
         if cursor.rowcount > 0:
-            print(f"Cancellato interesse per {email} su {airport_code}")
             return 0
         else:
             print("Nessun interesse trovato da cancellare")
@@ -118,7 +122,6 @@ def download_flights(client_id, client_secret):
         lista_interessi.extend(response)
     lista_partenze = []
     lista_arrivi = []
-    modalità = ""
     token = api.get_token(client_id, client_secret)
     start_time = datetime.now() - timedelta(days=1)
     start_time = int(start_time.timestamp())
@@ -126,12 +129,12 @@ def download_flights(client_id, client_secret):
     for code, mode in lista_interessi:
         if mode:
             modalità = "departure"
-            lista_partenze.extend(api.get_info_flight(token, code, start_time, time_now, modalità))
+            #lista_partenze.extend(api.get_info_flight(token, code, start_time, time_now, modalità))
         else:
             modalità = "arrival"
-            lista_arrivi.extend(api.get_info_flight(token, code, start_time, time_now, modalità))
-    insertOnDatabase(lista_partenze, DEPARTURES_TABLE)
-    insertOnDatabase(lista_arrivi, ARRIVALS_TABLE)
+            #lista_arrivi.extend(api.get_info_flight(token, code, start_time, time_now, modalità))
+    #insertOnDatabase(lista_partenze, DEPARTURES_TABLE)
+    #insertOnDatabase(lista_arrivi, ARRIVALS_TABLE)
 
 
 

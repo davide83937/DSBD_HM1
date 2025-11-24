@@ -39,6 +39,11 @@ class UserServiceStub(object):
                 request_serializer=service__pb2.UserCheckMessage.SerializeToString,
                 response_deserializer=service__pb2.UserResponse.FromString,
                 _registered_method=True)
+        self.delete_interestes_by_email = channel.unary_unary(
+                '/UserService/delete_interestes_by_email',
+                request_serializer=service__pb2.SendEmailMessage.SerializeToString,
+                response_deserializer=service__pb2.UserResponse.FromString,
+                _registered_method=True)
 
 
 class UserServiceServicer(object):
@@ -50,12 +55,23 @@ class UserServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def delete_interestes_by_email(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_UserServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'checkUser': grpc.unary_unary_rpc_method_handler(
                     servicer.checkUser,
                     request_deserializer=service__pb2.UserCheckMessage.FromString,
+                    response_serializer=service__pb2.UserResponse.SerializeToString,
+            ),
+            'delete_interestes_by_email': grpc.unary_unary_rpc_method_handler(
+                    servicer.delete_interestes_by_email,
+                    request_deserializer=service__pb2.SendEmailMessage.FromString,
                     response_serializer=service__pb2.UserResponse.SerializeToString,
             ),
     }
@@ -85,6 +101,33 @@ class UserService(object):
             target,
             '/UserService/checkUser',
             service__pb2.UserCheckMessage.SerializeToString,
+            service__pb2.UserResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def delete_interestes_by_email(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/UserService/delete_interestes_by_email',
+            service__pb2.SendEmailMessage.SerializeToString,
             service__pb2.UserResponse.FromString,
             options,
             channel_credentials,
