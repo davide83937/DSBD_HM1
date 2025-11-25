@@ -55,14 +55,17 @@ def insertOnDatabase(lista, table):
        insert_query = f"INSERT INTO {table} (Airport, Flight_code, Final_Airport, Departure_Time, Arrive_Time) VALUES (%s, %s, %s, %s, %s)"
        conn, cursor =connect()
        for flight in lista:
-           aeroporto = (flight.get("estDepartureAirport") or "").strip()
-           codice_volo = (flight.get("callsign") or "").strip()
-           aeroporto_finale = (flight.get("estArrivalAirport") or "").strip()
-           partenza_ts = flight.get("firstSeen")
-           arrivo_ts = flight.get("lastSeen")
-           partenza_dt = datetime.fromtimestamp(partenza_ts)
-           arrivo_dt = datetime.fromtimestamp(arrivo_ts)
-           cursor.execute(insert_query, (aeroporto, codice_volo, aeroporto_finale, partenza_dt, arrivo_dt))
+           try:
+               aeroporto = (flight.get("estDepartureAirport") or "").strip()
+               codice_volo = (flight.get("callsign") or "").strip()
+               aeroporto_finale = (flight.get("estArrivalAirport") or "").strip()
+               partenza_ts = flight.get("firstSeen")
+               arrivo_ts = flight.get("lastSeen")
+               partenza_dt = datetime.fromtimestamp(partenza_ts)
+               arrivo_dt = datetime.fromtimestamp(arrivo_ts)
+               cursor.execute(insert_query, (aeroporto, codice_volo, aeroporto_finale, partenza_dt, arrivo_dt))
+           except mysql.connector.IntegrityError as e:
+               updateFlight(cursor, table, aeroporto, codice_volo, partenza_dt, arrivo_dt)
     except mysql.connector.DatabaseError as e:
         print("Errore generico del database:", e)
         return -1
@@ -70,7 +73,9 @@ def insertOnDatabase(lista, table):
         if conn != None:
            disconnect(conn, cursor)
 
-
+def updateFlight(cursor, table, aeroporto, codice_volo, partenza, arrivo):
+    update_query = f"UPDATE {table} SET Arrive_Time = %s WHERE Flight = %s AND Airport = %s AND Departure_Time = %s"
+    cursor.execute(update_query, (table, arrivo, codice_volo, aeroporto, partenza))
 
 def selectInterests():
     conn = None
