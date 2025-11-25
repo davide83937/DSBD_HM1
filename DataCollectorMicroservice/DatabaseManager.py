@@ -74,8 +74,9 @@ def insertOnDatabase(lista, table):
            disconnect(conn, cursor)
 
 def updateFlight(cursor, table, aeroporto, codice_volo, partenza, arrivo):
-    update_query = f"UPDATE {table} SET Arrive_Time = %s WHERE Flight = %s AND Airport = %s AND Departure_Time = %s"
-    cursor.execute(update_query, (table, arrivo, codice_volo, aeroporto, partenza))
+
+    update_query = f"UPDATE {table} SET Arrive_Time = %s WHERE Flight_Code = %s AND Airport = %s AND Departure_Time = %s"
+    cursor.execute(update_query, (arrivo, codice_volo, aeroporto, partenza))
 
 def selectInterests():
     conn = None
