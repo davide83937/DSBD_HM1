@@ -1,3 +1,4 @@
+import os
 from concurrent import futures
 import grpc
 import service_pb2
@@ -5,7 +6,8 @@ import service_pb2_grpc
 import DbManager as db
 
 def get_stub():
-    channel = grpc.insecure_channel('localhost:50052')
+    target = os.getenv("TARGET_GRPC_HOST", "localhost:50052")
+    channel = grpc.insecure_channel(target)
     stub = service_pb2_grpc.UserServiceStub(channel)
     return stub
 

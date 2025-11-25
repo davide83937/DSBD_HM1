@@ -1,3 +1,4 @@
+import os
 from datetime import datetime, timedelta
 import mysql.connector
 import apiOpenSky as api
@@ -8,7 +9,7 @@ ARRIVALS_TABLE = "Flight_Data_Arrives"
 
 def connect():
     conn = mysql.connector.connect(
-        host="localhost",
+        host=os.getenv("DB_HOST", "localhost"),
         port=3306,
         user="anto",
         password="onta",
@@ -129,12 +130,12 @@ def download_flights(client_id, client_secret):
     for code, mode in lista_interessi:
         if mode:
             modalità = "departure"
-            #lista_partenze.extend(api.get_info_flight(token, code, start_time, time_now, modalità))
+            lista_partenze.extend(api.get_info_flight(token, code, start_time, time_now, modalità))
         else:
             modalità = "arrival"
-            #lista_arrivi.extend(api.get_info_flight(token, code, start_time, time_now, modalità))
-    #insertOnDatabase(lista_partenze, DEPARTURES_TABLE)
-    #insertOnDatabase(lista_arrivi, ARRIVALS_TABLE)
+            lista_arrivi.extend(api.get_info_flight(token, code, start_time, time_now, modalità))
+    insertOnDatabase(lista_partenze, DEPARTURES_TABLE)
+    insertOnDatabase(lista_arrivi, ARRIVALS_TABLE)
 
 
 

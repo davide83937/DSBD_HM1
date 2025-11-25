@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  usermanager:
+    build: ./UserManagerMicroservice
+    container_name: usermanager
+    environment:
+      # Nome del container del DB già esistente
+      - DB_HOST=mysql-db
+      # Configura Flask per ascoltare su tutte le interfacce
+      - FLASK_RUN_HOST=0.0.0.0
+      # Dove trovare l'altro microservizio gRPC
+      - TARGET_GRPC_HOST=datacollector:50052
+    ports:
+      - "5000:5000"   # Espone Flask all'host
+      - "50051:50051" # Opzionale: espone gRPC all'host per test
+    networks:
+      - app_network   # Rete interna per i microservizi
+      - existing_db_net # Rete per parlare col DB
+
+  datacollector:
+    build: ./DataCollectorMicroservice
+    container_name: datacollector
+    depends_on:
+      - usermanager
+    environment:
+      - DB_HOST=mysql-db
+      - FLASK_RUN_HOST=0.0.0.0
+      - TARGET_GRPC_HOST=usermanager:50051
+    ports:
+      - "5005:5005"
+      - "50052:50052"
+    networks:
+      - app_network
+      - existing_db_net
+
+networks:
+  app_network:
+    driver: bridge
+  
+  # Qui definisci la rete dove GIA' risiedono i tuoi DB
+  existing_db_net:
+    external: true
+    name: composedatabase_default

@@ -1,3 +1,5 @@
+import os
+
 import mysql.connector
 import random
 import string
@@ -5,7 +7,7 @@ import string
 
 def connect():
     conn = mysql.connector.connect(
-        host="localhost",
+        host=os.getenv("DB_HOST", "localhost"),
         port=3306,
         user="anto",
         password="onta",
@@ -73,11 +75,13 @@ def check_logging(email, token):
     conn = None
     cursor = None
     try:
-        check_login_query = "SELECT * FROM Logged_Users WHERE email = %s AND id_session = %s"
+        conn, cursor = connect()
         if token == "":
             check_login_query = "SELECT * FROM Logged_Users WHERE email = %s"
-        conn, cursor = connect()
-        cursor.execute(check_login_query, (email, token))
+            cursor.execute(check_login_query, (email,))
+        else:
+            check_login_query = "SELECT * FROM Logged_Users WHERE email = %s AND id_session = %s"
+            cursor.execute(check_login_query, (email, token))
         n = cursor.rowcount
         return check_n(n)
     except mysql.connector.DatabaseError as e:

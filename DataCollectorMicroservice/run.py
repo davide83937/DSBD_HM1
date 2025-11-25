@@ -37,4 +37,4 @@ appl.register_blueprint(app)
 if __name__ == "__main__":
     start_cancelling_task()
     start_downloading_flights()
-    appl.run(port=5005, debug=True, use_reloader=False)
+    appl.run(host='0.0.0.0', port=5005, debug=True, use_reloader=False)
