@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 import mysql.connector
-import testCred as api
+import apiOpenSky as api
 
 DEPARTURES_TABLE = "Flight_Data_Departures"
 ARRIVALS_TABLE = "Flight_Data_Arrives"
