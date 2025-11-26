@@ -12,6 +12,9 @@ app = Blueprint('app', __name__)
 def sha512_hash(s: str) -> str:
     return hashlib.sha512(s.encode()).hexdigest()
 
+def sha256_hash(s: str) -> str:
+    return hashlib.sha3_256(s.encode()).hexdigest()
+
 @app.route("/login", methods=["POST"])
 def login():
     try:
@@ -51,10 +54,15 @@ def registrazione():
         username = data["username"]
         password = data["password"]
         password = sha512_hash(password)
+        hash_mail = sha256_hash(email)
+        response = db.check_request(hash_mail)
+        if response == 0:
+            return {"message": "Registrazione andata a buon fine"}, 200
         response = db.check_user(email)
         if response == 0:
             response = db.registrazione(email, username, password)
             if response == 0:
+                db.insert_request(hash_mail)
                 return {"message": "Registrazione andata a buon fine"}, 200
             else:
                 return {"message": "Qualcosa è andato storto"}, 404

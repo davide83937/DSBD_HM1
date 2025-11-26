@@ -1,8 +1,8 @@
 import os
-
 import mysql.connector
 import random
 import string
+from datetime import datetime, timedelta
 
 
 def connect():
@@ -52,6 +52,23 @@ def check_user(email):
           disconnect(conn, cursor)
 
 
+def delete_old_request():
+    conn = None
+    cursor = None
+    try:
+        conn, cursor = connect()
+        query = f"""
+                        DELETE FROM Cache
+                        WHERE STR_TO_DATE(date, '%Y-%m-%d %H:%i:%s') < (NOW() - INTERVAL 1 MINUTE)
+                    """
+        cursor.execute(query)
+    except mysql.connector.DatabaseError as e:
+        print("Errore generico del database:", e)
+        return -1
+    finally:
+        if conn != None:
+            disconnect(conn, cursor)
+
 
 
 def cancellazione_sessione(email):
@@ -69,6 +86,37 @@ def cancellazione_sessione(email):
     finally:
          if conn != None:
              disconnect(conn, cursor)
+
+def insert_request(id):
+    conn = None
+    cursor = None
+    try:
+        conn, cursor = connect()
+        query = "INSERT INTO Cache (id_request, date) VALUES (%s, %s)"
+        cursor.execute(query, (id, datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+    except mysql.connector.DatabaseError as e:
+        print("Errore generico del database:", e)
+        return -1
+    finally:
+        if conn != None:
+            disconnect(conn, cursor)
+
+def check_request(id):
+    conn = None
+    cursor = None
+    try:
+        conn, cursor = connect()
+        query = "SELECT * FROM Cache WHERE id_request = %s"
+        cursor.execute(query, (id,))
+        n = cursor.rowcount
+        return check_n(n)
+
+    except mysql.connector.DatabaseError as e:
+        print("Errore generico del database:", e)
+        return -1
+    finally:
+        if conn != None:
+            disconnect(conn, cursor)
 
 
 def check_logging(email, token):
