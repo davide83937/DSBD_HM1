@@ -1,22 +1,29 @@
 version: '3.8'
 
 services:
+  redis:
+    image: redis:alpine            
+    container_name: redis_db
+    ports:
+      - "6379:6379"              
+    networks:
+      - app_network
+
+  
   usermanager:
     build: ./UserManagerMicroservice
     container_name: usermanager
     environment:
-      # Nome del container del DB già esistente
       - DB_HOST=mysql-db
-      # Configura Flask per ascoltare su tutte le interfacce
       - FLASK_RUN_HOST=0.0.0.0
-      # Dove trovare l'altro microservizio gRPC
       - TARGET_GRPC_HOST=datacollector:50052
+      - REDIS_HOST=redis
     ports:
-      - "5000:5000"   # Espone Flask all'host
-      - "50051:50051" # Opzionale: espone gRPC all'host per test
+      - "5000:5000"  
+      - "50051:50051" 
     networks:
-      - app_network   # Rete interna per i microservizi
-      - existing_db_net # Rete per parlare col DB
+      - app_network   
+      - existing_db_net 
 
   datacollector:
     build: ./DataCollectorMicroservice
@@ -38,7 +45,7 @@ networks:
   app_network:
     driver: bridge
   
-  # Qui definisci la rete dove GIA' risiedono i tuoi DB
+
   existing_db_net:
     external: true
     name: composedatabase_default

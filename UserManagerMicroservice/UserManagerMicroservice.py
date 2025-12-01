@@ -1,11 +1,11 @@
 import hashlib
-
 import grpc
 from flask import request
 from flask import Blueprint
 import DbManager as db
 import grpc_methods
 import service_pb2
+import redis_script as rs
 
 app = Blueprint('app', __name__)
 
@@ -55,14 +55,14 @@ def registrazione():
         password = data["password"]
         password = sha512_hash(password)
         hash_mail = sha256_hash(email)
-        response = db.check_request(hash_mail)
+        response = rs.check_request(hash_mail)
         if response == 0:
             return {"message": "Registrazione andata a buon fine"}, 200
         response = db.check_user(email)
         if response == 0:
             response = db.registrazione(email, username, password)
             if response == 0:
-                db.insert_request(hash_mail)
+                rs.insert_request(hash_mail, username)
                 return {"message": "Registrazione andata a buon fine"}, 200
             else:
                 return {"message": "Qualcosa è andato storto"}, 404

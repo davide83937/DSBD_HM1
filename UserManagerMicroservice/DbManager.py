@@ -87,37 +87,6 @@ def cancellazione_sessione(email):
          if conn != None:
              disconnect(conn, cursor)
 
-def insert_request(id):
-    conn = None
-    cursor = None
-    try:
-        conn, cursor = connect()
-        query = "INSERT INTO Cache (id_request, date) VALUES (%s, %s)"
-        cursor.execute(query, (id, datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
-    except mysql.connector.DatabaseError as e:
-        print("Errore generico del database:", e)
-        return -1
-    finally:
-        if conn != None:
-            disconnect(conn, cursor)
-
-def check_request(id):
-    conn = None
-    cursor = None
-    try:
-        conn, cursor = connect()
-        query = "SELECT * FROM Cache WHERE id_request = %s"
-        cursor.execute(query, (id,))
-        n = cursor.rowcount
-        return check_n(n)
-
-    except mysql.connector.DatabaseError as e:
-        print("Errore generico del database:", e)
-        return -1
-    finally:
-        if conn != None:
-            disconnect(conn, cursor)
-
 
 def check_logging(email, token):
     conn = None
