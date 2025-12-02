@@ -41,8 +41,7 @@ def insertInterests(email, airport_code, mode):
        conn, cursor = connect()
        cursor.execute(insert_query, (email, airport_code, mode))
        return check_count(cursor.rowcount)
-    except mysql.connector.DatabaseError as e:
-        print("Errore generico del database:", e)
+    except mysql.connector.DatabaseError:
         return -1
     finally:
         if conn != None:
@@ -64,10 +63,9 @@ def insertOnDatabase(lista, table):
                partenza_dt = datetime.fromtimestamp(partenza_ts)
                arrivo_dt = datetime.fromtimestamp(arrivo_ts)
                cursor.execute(insert_query, (aeroporto, codice_volo, aeroporto_finale, partenza_dt, arrivo_dt))
-           except mysql.connector.IntegrityError as e:
+           except mysql.connector.IntegrityError:
                updateFlight(cursor, table, aeroporto, codice_volo, partenza_dt, arrivo_dt)
-    except mysql.connector.DatabaseError as e:
-        print("Errore generico del database:", e)
+    except mysql.connector.DatabaseError:
         return -1
     finally:
         if conn != None:
@@ -87,8 +85,7 @@ def selectInterests():
         cursor.execute(query)
         risultati = cursor.fetchall()
         return risultati
-    except mysql.connector.DatabaseError as e:
-        print("Errore generico del database:", e)
+    except mysql.connector.DatabaseError:
         return -1
     finally:
         if conn != None:
@@ -109,10 +106,8 @@ def deleteInterest(email, airport_code, mode):
         if cursor.rowcount > 0:
             return 0
         else:
-            print("Nessun interesse trovato da cancellare")
             return 1
-    except mysql.connector.DatabaseError as e:
-        print(f"Errore generico del database:: {e}")
+    except mysql.connector.DatabaseError:
         return -1
     finally:
         if conn != None:
@@ -123,7 +118,6 @@ def download_flights(client_id, client_secret):
     lista_interessi = []
     response = selectInterests()
     if response == -1:
-        print("Impossibile recuperare gli interessi")
         return
     else:
         lista_interessi.extend(response)
@@ -158,8 +152,7 @@ def delete_old_flights():
             """
             cursor.execute(query)
         return 0
-    except mysql.connector.DatabaseError as e:
-        print("Errore generico del database:", e)
+    except mysql.connector.DatabaseError:
         return -1
     finally:
         if conn != None:
@@ -178,8 +171,7 @@ def get_flight_by_airport(airport_code, mode):
         cursor.execute(get_query, (airport_code,))
         result = cursor.fetchall()
         return result
-    except mysql.connector.DatabaseError as e:
-        print("Errore generico del database:", e)
+    except mysql.connector.DatabaseError:
         return -1
     finally:
         if conn != None:
@@ -207,8 +199,7 @@ def get_last_one(airport_code):
         cursor.execute(get_query, (airport_code,))
         last_departure = cursor.fetchone()
         return last_arrival, last_departure
-    except mysql.connector.DatabaseError as e:
-        print("Errore generico del database:", e)
+    except mysql.connector.DatabaseError:
         return -1
     finally:
         if conn != None:
@@ -241,8 +232,7 @@ def get_average_flights(airport_code, days):
         avg_arrivals = total_arrivals / int(days)
         avg_departures = total_departures / int(days)
         return avg_arrivals, avg_departures
-    except mysql.connector.DatabaseError as e:
-        print("Errore generico del database:", e)
+    except mysql.connector.DatabaseError:
         return -1
     finally:
         if conn != None:

@@ -2,7 +2,7 @@ import os
 import mysql.connector
 import random
 import string
-from datetime import datetime, timedelta
+
 
 
 def connect():
@@ -44,8 +44,7 @@ def check_user(email):
        cursor.execute(check_query)
        row = cursor.fetchone()
        return check_row(row)
-    except mysql.connector.DatabaseError as e:
-        print("Errore generico del database:", e)
+    except mysql.connector.DatabaseError:
         return -1
     finally:
         if conn != None:
@@ -62,8 +61,7 @@ def delete_old_request():
                         WHERE STR_TO_DATE(date, '%Y-%m-%d %H:%i:%s') < (NOW() - INTERVAL 1 MINUTE)
                     """
         cursor.execute(query)
-    except mysql.connector.DatabaseError as e:
-        print("Errore generico del database:", e)
+    except mysql.connector.DatabaseError:
         return -1
     finally:
         if conn != None:
@@ -80,8 +78,7 @@ def cancellazione_sessione(email):
         cursor.execute(query, (email,))
         n = cursor.rowcount
         return check_n(n)
-    except mysql.connector.DatabaseError as e:
-         print("Errore generico del database:", e)
+    except mysql.connector.DatabaseError:
          return -1
     finally:
          if conn != None:
@@ -101,8 +98,7 @@ def check_logging(email, token):
             cursor.execute(check_login_query, (email, token))
         n = cursor.rowcount
         return check_n(n)
-    except mysql.connector.DatabaseError as e:
-        print("Errore generico del database:", e)
+    except mysql.connector.DatabaseError:
         return -1
     finally:
         if conn != None:
@@ -131,8 +127,7 @@ def login(email, password, first):
                 return check_n(n)
         else:
             return response
-    except mysql.connector.DatabaseError as e:
-        print("Errore generico del database:", e)
+    except mysql.connector.DatabaseError:
         return -1
     finally:
         if conn != None:
@@ -148,8 +143,7 @@ def registrazione(email, username, password):
       cursor.execute(registration_query, (email, username, password))
       n = cursor.rowcount
       return check_n(n)
-    except mysql.connector.DatabaseError as e:
-        print("Errore generico del database:", e)
+    except mysql.connector.DatabaseError:
         return -1
     finally:
         if conn != None:
@@ -165,8 +159,7 @@ def cancellazione(email):
        cursor.execute(delete_query, (email,))
        n = cursor.rowcount
        return check_n(n)
-    except mysql.connector.DatabaseError as e:
-        print("Errore generico del database:", e)
+    except mysql.connector.DatabaseError:
         return -1
     finally:
         if conn != None:

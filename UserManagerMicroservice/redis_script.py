@@ -8,10 +8,13 @@ def insert_request(email_hash, username):
     try:
        r.set(email_hash, username, ex=60)
     except redis.ConnectionError:
-        print("Errore: Impossibile connettersi a Redis. Assicurati che il server sia attivo!")
+        return -1
 
 def check_request(email_hash):
-    if r.exists(email_hash):
-        return 0
-    else:
-        return 1
+    try:
+       if r.exists(email_hash):
+          return 0
+       else:
+          return 1
+    except redis.ConnectionError:
+        return -1
