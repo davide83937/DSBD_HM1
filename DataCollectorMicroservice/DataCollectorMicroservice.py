@@ -26,7 +26,7 @@ def sendInterest():
             mode = data["mode"]
             response = db.insertInterests(email, airport, mode)
             if response == 0:
-                return {"message": "Inserimento inserito"}
+                return {"message": "Inserimento inseritoo"}
             else:
                 return {"message": "Inserimento non inserito"}
         else:
