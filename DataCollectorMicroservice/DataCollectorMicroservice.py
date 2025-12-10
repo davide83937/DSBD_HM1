@@ -4,7 +4,7 @@ import service_pb2
 from flask import request
 from flask import Blueprint
 import grpc_manager
-import kafka as k
+import kafka_services as k
 
 app = Blueprint('app', __name__)
 

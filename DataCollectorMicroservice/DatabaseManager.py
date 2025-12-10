@@ -2,7 +2,7 @@ import os
 from datetime import datetime, timedelta
 import mysql.connector
 import apiOpenSky as api
-import kafka as k
+import kafka_services as k
 
 
 DEPARTURES_TABLE = "Flight_Data_Departures"

@@ -1,5 +1,5 @@
 import time
-import kafka as k
+import kafka_services as k
 from flask import Flask
 from DataCollectorMicroservice import app
 import threading
