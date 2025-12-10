@@ -1,4 +1,4 @@
-from confluent_kafka import Producer, Consumer, KafkaException
+from confluent_kafka import Producer, Consumer, KafkaException, KafkaError
 from datetime import datetime
 import json
 import os
@@ -6,72 +6,109 @@ import os
 topic1 = 'TOPIC1'
 timestamp = ""
 
-bootstrap_servers = os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'localhost:29092')
+# NOTA: Se sei dentro Docker, questo DEVE essere 'kafka_examples:9092'
+# Se sei sul PC e lanci questo script fuori da Docker, usa 'localhost:29092'
+bootstrap_servers = os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'kafka_examples:9092')
 
 producer_config = {
     'bootstrap.servers': bootstrap_servers,
-    'acks': 'all',  # Maximum durability - waits for all in-sync replicas
-    'batch.size': 500,  #just an example, use default (16KB) which is more efficient
-    'max.in.flight.requests.per.connection': 1,  # Only one in-flight request,default (5) is balanced
-    'retries': 3,  # Retry on transient errors
-    'linger.ms': 10,  # Wait 10ms to batch messages (reduces overhead)
+    'acks': 'all',
+    # 'batch.size': 500,  <-- RIMOSSO: troppo piccolo, rallenta tutto. Usa il default.
+    'retries': 3,
+    'linger.ms': 10,
 }
 
 consumer_config = {
     'bootstrap.servers': bootstrap_servers,
     'group.id': 'group2',
     'auto.offset.reset': 'earliest',
-    'enable.auto.commit': False,  # Manual commit for batch control
-    'max.poll.interval.ms': 300000,  # 5 minutes timeout (important for batch processing)
+    'enable.auto.commit': False,  # Commit manuale (ok, ma ricordati di farlo!)
+    'max.poll.interval.ms': 300000,
 }
 
+
 def create_producer():
-    producer = Producer(producer_config)
-    return producer
+    return Producer(producer_config)
+
 
 def create_consumer():
-    consumer = Consumer(consumer_config)
-    return consumer
+    return Consumer(consumer_config)
+
 
 def delivery_report(err, msg):
+    """ Callback chiamata per confermare l'invio """
     if err:
-        print(f"Delivery failed: {err}")
+        print(f"Delivery failed: {err}", flush=True)
     else:
-        print(f"Message delivered to {msg.topic()} [{msg.partition()}] at offset {msg.offset()}")
+        print(f"Message delivered to {msg.topic()} [{msg.partition()}] at offset {msg.offset()}", flush=True)
+
 
 def delivery_messagge(producer):
     value = "Aggiornamento dei voli effettuato"
     message = {'timestamp': datetime.now().isoformat(), 'value': value}
+
+    # 1. Serializzazione corretta in bytes
+    payload = json.dumps(message).encode('utf-8')
+
     producer.produce(
         topic1,
-        json.dumps(message).encode('utf-8'),  # Explicit encoding
+        payload,
         callback=delivery_report
     )
 
+    # 2. IMPORTANTE: poll() serve a gestire le callback di conferma
+    producer.poll(0)
+
+    # 3. CRUCIALE: Forza l'invio immediato dei dati nel buffer
+    producer.flush()
+    print("Messaggio inviato (Flush completato)", flush=True)
+
+
 def check_message_kafka(consumer):
+    # 4. IMPORTANTE: Devi iscriverti al topic prima di fare poll!
     global timestamp
-    while True:
-       msg = consumer.poll(1.0)
+    consumer.subscribe([topic1])
+    print(f"Consumer in ascolto su {topic1}...", flush=True)
 
-       if msg is None:
-          continue
+    try:
+        while True:
+            msg = consumer.poll(1.0)  # Attende 1 secondo
 
-       if msg.error():
-          if msg.error().code() == KafkaException._PARTITION_EOF:
-            print(f"End of partition {msg.partition()}")
-          else:
-            print(f"Consumer error: {msg.error()}")
-          continue
+            if msg is None:
+                continue
 
-       try:
-          data = json.loads(msg.value().decode('utf-8'))
-          timestamp = data['timestamp']
+            if msg.error():
+                # Usa KafkaError, non KafkaException per i codici
+                if msg.error().code() == KafkaError._PARTITION_EOF:
+                    # Non è un vero errore, solo fine dei dati vecchi
+                    continue
+                else:
+                    print(f"Consumer error: {msg.error()}", flush=True)
+                    continue
 
-          consumer.commit(asynchronous=False)
-          print(f"Committed offset: {msg.offset()}\n")
+            try:
+                # Decodifica
+                data = json.loads(msg.value().decode('utf-8'))
 
+                # Estrai il timestamp
+                received_timestamp = data.get('timestamp')
+                timestamp = received_timestamp
+                print(f"Ricevuto timestamp: {received_timestamp}", flush=True)
 
-       except (json.JSONDecodeError, KeyError) as e:
-          print(f"Malformed message at offset {msg.offset()}: {e}")
-          consumer.commit(msg)
-          continue
+                # Commit manuale (perché hai enable.auto.commit = False)
+                consumer.commit(asynchronous=False)
+                print(f"Committed offset: {msg.offset()}\n", flush=True)
+
+                # Se vuoi uscire dopo aver trovato un messaggio, togli il commento sotto:
+                # return received_timestamp
+
+            except (json.JSONDecodeError, KeyError) as e:
+                print(f"Malformed message at offset {msg.offset()}: {e}", flush=True)
+                # Committiamo comunque per non bloccarci su un messaggio rotto all'infinito
+                consumer.commit(asynchronous=False)
+                continue
+
+    except KeyboardInterrupt:
+        print("Stop consumer...", flush=True)
+    finally:
+        consumer.close()
