@@ -19,13 +19,12 @@ def background_cancelling_flights():
 def backgroung_downloading_flights():
     while True:
         db.download_flights(CLIENT_ID, CLIENT_SECRET)
-        time.sleep(30)
+        time.sleep(43200)
 
 def start_downloading_flights():
     worker = threading.Thread(target=backgroung_downloading_flights)
     worker.daemon = True
     worker.start()
-
 
 
 def start_cancelling_task():
@@ -36,7 +35,7 @@ def start_cancelling_task():
 def background_update_timestamp_update():
     while True:
         k.check_message_kafka(consumer)
-        time.sleep(60)
+        time.sleep(5)
 
 def start_update_timestamp():
     worker = threading.Thread(target=background_update_timestamp_update)

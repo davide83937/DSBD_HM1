@@ -133,15 +133,20 @@ def download_flights(client_id, client_secret):
     start_time = int(start_time.timestamp())
     time_now = int(datetime.now().timestamp())
     for code, mode in lista_interessi:
+      try:
         if mode:
             modalità = "departure"
             lista_partenze.extend(api.get_info_flight(token, code, start_time, time_now, modalità))
         else:
             modalità = "arrival"
             lista_arrivi.extend(api.get_info_flight(token, code, start_time, time_now, modalità))
+      except Exception as e:
+          print(f"Errore API OpenSky per {code}: {e}", flush=True)
+          # Continua con il prossimo aeroporto invece di morire
+          continue
     insertOnDatabase(lista_partenze, DEPARTURES_TABLE)
     insertOnDatabase(lista_arrivi, ARRIVALS_TABLE)
-    k.delivery_messagge(producer)
+    k.delivery_messagge(producer, k.topic1, k.message)
 
 
 
@@ -241,3 +246,72 @@ def get_average_flights(airport_code, days):
         if conn != None:
             disconnect(conn, cursor)
 
+
+def check_flight_conditions():
+    conn = None
+    cursor = None
+    alerts = []  # Lista per salvare i risultati delle condizioni verificate
+
+    try:
+        conn, cursor = connect()
+
+        # 1. Recupera tutti i profili di interesse
+        # Assumiamo che la tabella Interessi abbia le colonne: email, airport, mode, high_value, low_value
+        query_interessi = "SELECT email, airport, mode, high_value, low_value FROM Interessi"
+        cursor.execute(query_interessi)
+        interessi = cursor.fetchall()
+
+        for profilo in interessi:
+            email, airport, mode, high_val, low_val = profilo
+
+            # 2. Determina quale tabella e quale colonna interrogare in base al 'mode'
+            # Assunzione: mode 0 = Arrivi, mode 1 = Partenze
+            if mode == 0:
+                # Per gli arrivi cerchiamo 'Final_Airport' (destinazione) o 'Airport' se è l'aeroporto di riferimento
+                # Basandomi sulla tua funzione precedente: Flight_Data_Arrives -> WHERE Final_Airport = %s
+                table = "Flight_Data_Arrives"
+                where_col = "Final_Airport"
+            else:
+                # Per le partenze: Flight_Data_Departures -> WHERE Airport = %s
+                table = "Flight_Data_Departures"
+                where_col = "Airport"
+
+            # 3. Recupera i voli per contarli e ottenere le info
+            query_voli = f"""
+                SELECT Airport, Arrive_Time, Departure_Time, Final_Airport, Flight_Code 
+                FROM {table} 
+                WHERE {where_col} = %s
+            """
+            cursor.execute(query_voli, (airport,))
+            voli = cursor.fetchall()
+
+            count = len(voli)
+            condizione_superata = None
+
+            # 4. Verifica le condizioni
+            if count > high_val:
+                condizione_superata = 'HIGH_VALUE_EXCEEDED'
+            elif count < low_val:
+                condizione_superata = 'LOW_VALUE_REACHED'
+
+            # 5. Se una condizione è soddisfatta, salva le info
+            if condizione_superata:
+                alert_info = {
+                    'email': email,
+                    'airport': airport,
+                    'mode': 'Arrivals' if mode == 0 else 'Departures',
+                    'condition': condizione_superata,
+                    'current_count': count,
+                    'threshold': high_val if condizione_superata == 'HIGH_VALUE_EXCEEDED' else low_val,
+                    'flights': voli  # Restituisce la lista delle tuple dei voli
+                }
+                alerts.append(alert_info)
+
+        return alerts
+
+    except mysql.connector.DatabaseError as err:
+        print(f"Error: {err}")
+        return -1
+    finally:
+        if conn is not None:
+            disconnect(conn, cursor)

@@ -65,7 +65,10 @@ services:
     build: ./DataCollectorMicroservice
     container_name: datacollector
     depends_on:
-      - usermanager
+      usermanager:
+        condition: service_started
+      kafka_examples:
+        condition: service_healthy
     environment:
       - DB_HOST=mysql-db
       - FLASK_RUN_HOST=0.0.0.0
