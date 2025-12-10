@@ -4,3 +4,4 @@ grpcio-tools
 mysql-connector-python
 requests
 protobuf
+confluent-kafka

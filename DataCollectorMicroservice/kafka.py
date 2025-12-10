@@ -1,12 +1,15 @@
 from confluent_kafka import Producer, Consumer, KafkaException
 from datetime import datetime
 import json
+import os
 
 topic1 = 'TOPIC1'
 timestamp = ""
 
+bootstrap_servers = os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'localhost:29092')
+
 producer_config = {
-    'bootstrap.servers': 'localhost:29092',
+    'bootstrap.servers': bootstrap_servers,
     'acks': 'all',  # Maximum durability - waits for all in-sync replicas
     'batch.size': 500,  #just an example, use default (16KB) which is more efficient
     'max.in.flight.requests.per.connection': 1,  # Only one in-flight request,default (5) is balanced
@@ -15,7 +18,7 @@ producer_config = {
 }
 
 consumer_config = {
-    'bootstrap.servers': 'localhost:29092',
+    'bootstrap.servers': bootstrap_servers,
     'group.id': 'group2',
     'auto.offset.reset': 'earliest',
     'enable.auto.commit': False,  # Manual commit for batch control
