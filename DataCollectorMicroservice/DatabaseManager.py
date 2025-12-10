@@ -2,10 +2,13 @@ import os
 from datetime import datetime, timedelta
 import mysql.connector
 import apiOpenSky as api
+import kafka as k
+
 
 DEPARTURES_TABLE = "Flight_Data_Departures"
 ARRIVALS_TABLE = "Flight_Data_Arrives"
 
+producer = k.create_producer()
 
 def connect():
     conn = mysql.connector.connect(
@@ -33,11 +36,11 @@ def check_count(row_count):
     else:
         return 1
 
-def insertInterests(email, airport_code, mode):
+def insertInterests(email, airport_code, mode, h_value, l_value):
     conn = None
     cursor = None
     try:
-       insert_query = f"INSERT INTO Interessi (email, airport, mode) VALUES (%s, %s, %s)"
+       insert_query = f"INSERT INTO Interessi (email, airport, mode, h_value, l_value) VALUES (%s, %s, %s, %s, %s)"
        conn, cursor = connect()
        cursor.execute(insert_query, (email, airport_code, mode))
        return check_count(cursor.rowcount)
@@ -72,7 +75,6 @@ def insertOnDatabase(lista, table):
            disconnect(conn, cursor)
 
 def updateFlight(cursor, table, aeroporto, codice_volo, partenza, arrivo):
-
     update_query = f"UPDATE {table} SET Arrive_Time = %s WHERE Flight_Code = %s AND Airport = %s AND Departure_Time = %s"
     cursor.execute(update_query, (arrivo, codice_volo, aeroporto, partenza))
 
@@ -136,6 +138,7 @@ def download_flights(client_id, client_secret):
             lista_arrivi.extend(api.get_info_flight(token, code, start_time, time_now, modalità))
     insertOnDatabase(lista_partenze, DEPARTURES_TABLE)
     insertOnDatabase(lista_arrivi, ARRIVALS_TABLE)
+    k.delivery_messagge(producer)
 
 
 
@@ -146,10 +149,7 @@ def delete_old_flights():
         tables = ["Flight_Data_Arrives", "Flight_Data_Departures"]
         conn, cursor = connect()
         for table in tables:
-            query = f"""
-                DELETE FROM {table} 
-                WHERE STR_TO_DATE(Arrive_Time, '%Y-%m-%d %H:%i:%s') < (NOW() - INTERVAL 10 DAY)
-            """
+            query = f"""DELETE FROM {table} WHERE STR_TO_DATE(Arrive_Time, '%Y-%m-%d %H:%i:%s') < (NOW() - INTERVAL 10 DAY)"""
             cursor.execute(query)
         return 0
     except mysql.connector.DatabaseError:

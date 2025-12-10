@@ -1,10 +1,10 @@
 import grpc
-
 import DatabaseManager as db
 import service_pb2
 from flask import request
 from flask import Blueprint
 import grpc_manager
+import kafka as k
 
 app = Blueprint('app', __name__)
 
@@ -13,18 +13,36 @@ CLIENT_SECRET = "ewpHTQ27KoTGv4vMoCyLT8QrIt4sLr3z"
 ARRIVAL = "arrival"
 DEPARTURE = "departure"
 
+consumer = k.create_consumer()
+consumer.subscribe([k.topic1])
+
+@app.route("/check_time_update", methods=["POST"])
+def check_time_update():
+    try:
+        email = request.json["email"]
+        t = k.timestamp
+        return {f"message: {t}"}
+
+    except KeyError as e:
+      campo_mancante = e.args[0]
+      return {"error": f"Manca il campo obbligatorio: {campo_mancante}"}, 400
+
+
+
 @app.route("/send_interest", methods=["POST"])
 def sendInterest():
     try:
         data = request.json
         email = data["email"]
         token = data["token"]
+        h_value = data["h_value"]
+        l_value = data["l_value"]
         stub = grpc_manager.get_stub()
         response = stub.checkUser(service_pb2.UserCheckMessage(email=email, token=token))
         if response.status == 0:
             airport = data["airport_code"]
             mode = data["mode"]
-            response = db.insertInterests(email, airport, mode)
+            response = db.insertInterests(email, airport, mode, h_value, l_value)
             if response == 0:
                 return {"message": "Inserimento inseritoo"}
             else:
