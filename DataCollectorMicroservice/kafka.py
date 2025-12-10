@@ -49,7 +49,7 @@ def delivery_messagge(producer):
     )
 
 def check_message_kafka(consumer):
-
+    global timestamp
     while True:
        msg = consumer.poll(1.0)
 

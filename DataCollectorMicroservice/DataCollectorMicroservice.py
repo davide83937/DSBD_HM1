@@ -13,15 +13,14 @@ CLIENT_SECRET = "ewpHTQ27KoTGv4vMoCyLT8QrIt4sLr3z"
 ARRIVAL = "arrival"
 DEPARTURE = "departure"
 
-consumer = k.create_consumer()
-consumer.subscribe([k.topic1])
+
 
 @app.route("/check_time_update", methods=["POST"])
 def check_time_update():
     try:
         email = request.json["email"]
         t = k.timestamp
-        return {f"message: {t}"}
+        return {"message": f"{t}"}
 
     except KeyError as e:
       campo_mancante = e.args[0]

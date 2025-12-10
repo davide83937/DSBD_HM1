@@ -10,13 +10,15 @@ ARRIVALS_TABLE = "Flight_Data_Arrives"
 
 producer = k.create_producer()
 
+
 def connect():
     conn = mysql.connector.connect(
         host=os.getenv("DB_HOST", "localhost"),
         port=3306,
         user="anto",
         password="onta",
-        database="DataDB"
+        database="DataDB",
+        autocommit=True
     )
     cursor = conn.cursor(buffered=True)
     cursor.execute("SELECT DATABASE();")
@@ -40,11 +42,12 @@ def insertInterests(email, airport_code, mode, h_value, l_value):
     conn = None
     cursor = None
     try:
-       insert_query = f"INSERT INTO Interessi (email, airport, mode, h_value, l_value) VALUES (%s, %s, %s, %s, %s)"
+       insert_query = f"INSERT INTO Interessi (email, airport, high_value, low_value, mode) VALUES (%s, %s, %s, %s, %s)"
        conn, cursor = connect()
-       cursor.execute(insert_query, (email, airport_code, mode))
+       cursor.execute(insert_query, (email, airport_code, h_value, l_value, mode))
        return check_count(cursor.rowcount)
-    except mysql.connector.DatabaseError:
+    except mysql.connector.Error as err:
+        print(f"!!! ERRORE CRITICO SQL !!! : {err}", flush=True)
         return -1
     finally:
         if conn != None:

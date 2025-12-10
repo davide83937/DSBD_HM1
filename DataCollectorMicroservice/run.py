@@ -9,6 +9,7 @@ CLIENT_ID = "davidepanto@gmail.com-api-client"
 CLIENT_SECRET = "ewpHTQ27KoTGv4vMoCyLT8QrIt4sLr3z"
 
 consumer = k.create_consumer()
+consumer.subscribe([k.topic1])
 
 def background_cancelling_flights():
     while True:
@@ -18,7 +19,7 @@ def background_cancelling_flights():
 def backgroung_downloading_flights():
     while True:
         db.download_flights(CLIENT_ID, CLIENT_SECRET)
-        time.sleep(43200)
+        time.sleep(30)
 
 def start_downloading_flights():
     worker = threading.Thread(target=backgroung_downloading_flights)
