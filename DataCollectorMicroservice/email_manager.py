@@ -2,7 +2,7 @@ import smtplib
 import ssl
 from email.message import EmailMessage
 
-email = "davidepanto@gmil.com"
+email = "davidepanto@gmail.com"
 my_password = "rwqi sycq dolj bllf"
 
 def make_corpo(email, aircode, condizione):
