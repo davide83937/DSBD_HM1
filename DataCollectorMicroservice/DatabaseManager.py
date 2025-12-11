@@ -4,6 +4,7 @@ import mysql.connector
 import apiOpenSky as api
 import kafka_services as k
 import circuit_breaker
+from circuit_breaker import CircuitBreakerOpenException
 
 
 DEPARTURES_TABLE = "Flight_Data_Departures"
@@ -141,6 +142,10 @@ def download_flights(client_id, client_secret):
         else:
             modalità = "arrival"
             lista_arrivi.extend(cb.call(api.get_info_flight(token, code, start_time, time_now, modalità)))
+      except CircuitBreakerOpenException:
+          # Questo verrà stampato SOLO quando il circuito è aperto
+          print(f"Circuito APERTO per {code}. Chiamata bloccata per sicurezza.", flush=True)
+          continue
       except Exception as e:
           print(f"Errore API OpenSky per {code}: {e}", flush=True)
           # Continua con il prossimo aeroporto invece di morire
