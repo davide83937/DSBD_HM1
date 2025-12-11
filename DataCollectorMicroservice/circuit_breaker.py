@@ -44,7 +44,7 @@ class CircuitBreaker:
                     # Transition to HALF_OPEN state after recovery timeout
                     self.state = 'HALF_OPEN'
                     print('Circuit breaker is halfopeneed', flush=True)
-                    raise CircuitBreakerOpenException
+                    #raise CircuitBreakerOpenException
                 else:
                     # Circuit is still open; deny the call
                     print('Circuit breaker is open yet', flush=True)

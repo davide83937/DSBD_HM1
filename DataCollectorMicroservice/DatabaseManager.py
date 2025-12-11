@@ -92,7 +92,8 @@ def selectInterests():
         cursor.execute(query)
         risultati = cursor.fetchall()
         return risultati
-    except mysql.connector.DatabaseError:
+    except mysql.connector.Error as e:
+        print(f"!!! ERRORE DB in selectInterests: {e}", flush=True)
         return -1
     finally:
         if conn != None:

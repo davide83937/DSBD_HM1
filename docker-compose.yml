@@ -80,6 +80,7 @@ services:
       - DB_HOST=mysql-db
       - FLASK_RUN_HOST=0.0.0.0
       - TARGET_GRPC_HOST=usermanager:50051
+      - PYTHONUNBUFFERED=1
     ports:
       #- "5005:5005"
       - "50052:50052"
