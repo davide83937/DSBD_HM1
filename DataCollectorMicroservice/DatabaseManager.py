@@ -138,10 +138,10 @@ def download_flights(client_id, client_secret):
       try:
         if mode:
             modalità = "departure"
-            lista_partenze.extend(cb.call(api.get_info_flight(token, code, start_time, time_now, modalità)))
+            lista_partenze.extend(cb.call(api.get_info_flight,token, code, start_time, time_now, modalità))
         else:
             modalità = "arrival"
-            lista_arrivi.extend(cb.call(api.get_info_flight(token, code, start_time, time_now, modalità)))
+            lista_arrivi.extend(cb.call(api.get_info_flight,token, code, start_time, time_now, modalità))
       except CircuitBreakerOpenException:
           # Questo verrà stampato SOLO quando il circuito è aperto
           print(f"Circuito APERTO per {code}. Chiamata bloccata per sicurezza.", flush=True)

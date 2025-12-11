@@ -87,6 +87,7 @@ services:
       - app_network
       - existing_db_net
 
+
   alert_system:
       build: ./DataCollectorMicroservice
       container_name: alert_system
