@@ -3,13 +3,14 @@ from datetime import datetime, timedelta
 import mysql.connector
 import apiOpenSky as api
 import kafka_services as k
+import circuit_breaker
 
 
 DEPARTURES_TABLE = "Flight_Data_Departures"
 ARRIVALS_TABLE = "Flight_Data_Arrives"
 
 producer = k.create_producer()
-
+cb = circuit_breaker.CircuitBreaker()
 
 def connect():
     conn = mysql.connector.connect(
@@ -136,10 +137,10 @@ def download_flights(client_id, client_secret):
       try:
         if mode:
             modalità = "departure"
-            lista_partenze.extend(api.get_info_flight(token, code, start_time, time_now, modalità))
+            lista_partenze.extend(cb.call(api.get_info_flight(token, code, start_time, time_now, modalità)))
         else:
             modalità = "arrival"
-            lista_arrivi.extend(api.get_info_flight(token, code, start_time, time_now, modalità))
+            lista_arrivi.extend(cb.call(api.get_info_flight(token, code, start_time, time_now, modalità)))
       except Exception as e:
           print(f"Errore API OpenSky per {code}: {e}", flush=True)
           # Continua con il prossimo aeroporto invece di morire

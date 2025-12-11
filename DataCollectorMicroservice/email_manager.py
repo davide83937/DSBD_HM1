@@ -2,8 +2,8 @@ import smtplib
 import ssl
 from email.message import EmailMessage
 
-email = "davidepanto@gmail.com"
-my_password = "rwqi sycq dolj bllf"
+email = "stiamo.volando2@gmail.com"
+my_password = "hndh txfz wicm ehzh"
 
 def make_corpo(email, aircode, condizione):
     corpo = f"Ciao {email}, ti vogliamo avvertire che le tue richieste sui voli relativi all'aeroporto con codice {aircode}, hanno superato la seguente condizione: {condizione}"
