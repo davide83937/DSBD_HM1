@@ -7,9 +7,11 @@ import DatabaseManager as db
 
 CLIENT_ID = "davidepanto@gmail.com-api-client"
 CLIENT_SECRET = "ewpHTQ27KoTGv4vMoCyLT8QrIt4sLr3z"
+NAME = 1
 
 consumer = k.create_consumer()
 consumer.subscribe([k.topic1])
+
 
 def background_cancelling_flights():
     while True:
@@ -33,9 +35,18 @@ def start_cancelling_task():
     worker.start()
 
 def background_update_timestamp_update():
-    while True:
-        k.check_message_kafka(consumer)
-        time.sleep(5)
+    try:
+        while True:
+            k.check_message_kafka(consumer, NAME)
+            time.sleep(5)
+    except KeyboardInterrupt:
+        print("Interruzione manuale ricevuta. Chiusura in corso...")
+    except Exception as e:
+        print(f"Errore critico nel loop: {e}")
+    finally:
+        consumer.close()
+
+
 
 def start_update_timestamp():
     worker = threading.Thread(target=background_update_timestamp_update)

@@ -306,9 +306,7 @@ def check_flight_conditions():
                     'flights': voli  # Restituisce la lista delle tuple dei voli
                 }
                 alerts.append(alert_info)
-
         return alerts
-
     except mysql.connector.DatabaseError as err:
         print(f"Error: {err}")
         return -1

@@ -2,16 +2,18 @@ import kafka_services as k
 import threading
 import time
 import DatabaseManager as db
-from DataCollectorMicroservice.kafka_services import message
+
+NAME = 1
 
 consumer = k.create_consumer()
 consumer.subscribe([k.topic1])
 
 producer = k.create_producer()
 
-def background_update_timestamp_update():
+def background_timestamp_update():
+  try:
     while True:
-        result = k.check_message_kafka(consumer)
+        result = k.check_message_kafka(consumer, NAME)
         if result:
             alert = []
             alert = db.check_flight_conditions()
@@ -19,8 +21,12 @@ def background_update_timestamp_update():
                 message = k.return_message(a['email'], a['airport'], a['condition'])
                 k.delivery_messagge(producer, k.topic2, message)
         time.sleep(5)
+  except KeyboardInterrupt:
+      print("Interruzione manuale ricevuta. Chiusura in corso...")
+  except Exception as e:
+      print(f"Errore critico nel loop: {e}")
+  finally:
+      consumer.close()
 
-def start_update_timestamp():
-    worker = threading.Thread(target=background_update_timestamp_update)
-    worker.daemon = True
-    worker.start()
+if __name__ == "__main__":
+    background_timestamp_update()
