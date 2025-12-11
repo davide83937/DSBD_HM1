@@ -1,3 +1,4 @@
+import time
 import kafka_services as k
 import email_manager as mail
 
@@ -14,8 +15,7 @@ def watch_kafka():
             utente, airport, condition = result
             corpo = mail.make_corpo(utente, airport, condition)
             mail.send_email(utente, corpo)
-
-
+        time.sleep(1)
   except KeyboardInterrupt:
     print("Interruzione manuale ricevuta. Chiusura in corso...")
   except Exception as e:
@@ -26,3 +26,4 @@ def watch_kafka():
 
 if __name__ == "__main__":
     watch_kafka()
+
