@@ -79,6 +79,32 @@ services:
     networks:
       - app_network
       - existing_db_net
+    # NUOVO SERVIZIO: Alert System (Controlla le condizioni dei voli)
+  alert_system:
+      build: ./DataCollectorMicroservice
+      container_name: alert_system
+      command: python AlertSystem.py
+      depends_on:
+        - datacollector
+        - kafka_examples
+      environment:
+        - DB_HOST=mysql-db
+        - KAFKA_BOOTSTRAP_SERVERS=kafka_examples:9092
+      networks:
+        - app_network
+        - existing_db_net
+
+    # NUOVO SERVIZIO: Notifier System (Invia le email)
+  notifier_system:
+      build: ./DataCollectorMicroservice
+      container_name: notifier_system
+      command: python AlertNotifierSystem.py
+      depends_on:
+        - kafka_examples
+      environment:
+        - KAFKA_BOOTSTRAP_SERVERS=kafka_examples:9092
+      networks:
+        - app_network
 
 networks:
   app_network:

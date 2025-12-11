@@ -24,20 +24,20 @@ producer_config = {
     'linger.ms': 10,
 }
 
-consumer_config = {
-    'bootstrap.servers': bootstrap_servers,
-    'group.id': 'group2',
-    'auto.offset.reset': 'earliest',
-    'enable.auto.commit': False,  # Commit manuale (ok, ma ricordati di farlo!)
-    'max.poll.interval.ms': 300000,
-}
 
 
 def create_producer():
     return Producer(producer_config)
 
 
-def create_consumer():
+def create_consumer(group_id):
+    consumer_config = {
+        'bootstrap.servers': bootstrap_servers,
+        'group.id': group_id,
+        'auto.offset.reset': 'earliest',
+        'enable.auto.commit': False,  # Commit manuale (ok, ma ricordati di farlo!)
+        'max.poll.interval.ms': 300000,
+    }
     return Consumer(consumer_config)
 
 

@@ -5,7 +5,7 @@ import DatabaseManager as db
 
 NAME = 1
 
-consumer = k.create_consumer()
+consumer = k.create_consumer("group2")
 consumer.subscribe([k.topic1])
 
 producer = k.create_producer()
