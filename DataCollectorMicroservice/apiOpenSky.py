@@ -4,7 +4,7 @@ import requests
 
 CLIENT_ID = "davidepanto@gmail.com-api-client"
 CLIENT_SECRET = "ewpHTQ27KoTGv4vMoCyLT8QrIt4sLr3z"
-AIRPORT = "LICC"
+
 
 
 def get_token(client_id, client_secret):
@@ -37,7 +37,6 @@ def get_info_flight(token, airport, begin_ts, end_ts, type):
 
 
 def get_data(start_str):
-   #icao_code =icao_code.strip().upper()
    start_str = start_str.strip()
    end_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
    print("----------------------------")
