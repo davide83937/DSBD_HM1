@@ -147,26 +147,27 @@ def download_flights(client_id, client_secret):
             lista_arrivi.extend(cb.call(api.get_info_flight,token, code, start_time, time_now, modalità))
 
       except CircuitBreakerOpenException:
+          aggiornamento_convalidato = False
           raise
           #aggiornamento_convalidato = False
           #continue
       except Exception as e:
           print(f"Errore API OpenSky per {code}: {e}", flush=True)
-          aggiornamento_convalidato = False
+
           continue
 
-    if aggiornamento_convalidato:
-        dati_salvati = False
 
-        if lista_partenze:
+      dati_salvati = False
+
+      if lista_partenze:
             insertOnDatabase(lista_partenze, DEPARTURES_TABLE)
             dati_salvati = True
 
-        if lista_arrivi:
+      if lista_arrivi:
             insertOnDatabase(lista_arrivi, ARRIVALS_TABLE)
             dati_salvati = True
 
-        if dati_salvati:
+      if dati_salvati:
             k.delivery_messagge(producer, k.topic1, k.message)
 
 

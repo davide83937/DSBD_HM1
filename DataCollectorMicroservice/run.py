@@ -49,20 +49,20 @@ def backgroung_downloading_flights():
             # Ritorno al normale funzionamento!
                     print("Fallback API SUCCESS. Ritorno alla modalità MAIN.", flush=True)
                     api_mode = MODE_MAIN
-                    set_polling_interval(43200)  # Ritorna all'intervallo di 12 ore
+                    set_polling_interval(10)  # Ritorna all'intervallo di 12 ore
                 else:
                    # Fallback API non funziona, continua a riprovare velocemente
-                    set_polling_interval(60)
+                    set_polling_interval(10)
 
             # CATTURA L'ECCEZIONE DEL CIRCUIT BREAKER
         except CircuitBreakerOpenException:
            # Succede solo quando db.download_flights fallisce per la prima volta
            print("Circuit Breaker OPEN. Passaggio immediato alla modalità FALLBACK.", flush=True)
            api_mode = MODE_FALLBACK
-           set_polling_interval(60)  # Polling veloce (es. 60 secondi)
+           set_polling_interval(10)  # Polling veloce (es. 60 secondi)
         except Exception as e:
            print(f"Errore generale nel loop: {e}", flush=True)
-           set_polling_interval(60)  # Rallenta comunque per sicurezza
+           set_polling_interval(10)  # Rallenta comunque per sicurezza
 
         # Il thread si ferma per l'intervallo attuale
         time.sleep(polling_config["interval"])
