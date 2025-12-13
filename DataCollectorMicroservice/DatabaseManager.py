@@ -132,7 +132,6 @@ def download_flights(client_id, client_secret):
         lista_interessi.extend(response)
     lista_partenze = []
     lista_arrivi = []
-    aggiornamento_convalidato = True
     token = api.get_token(client_id, client_secret)
     start_time = datetime.now() - timedelta(days=1)
     start_time = int(start_time.timestamp())
@@ -147,15 +146,10 @@ def download_flights(client_id, client_secret):
             lista_arrivi.extend(cb.call(api.get_info_flight,token, code, start_time, time_now, modalità))
 
       except CircuitBreakerOpenException:
-          aggiornamento_convalidato = False
           raise
-          #aggiornamento_convalidato = False
-          #continue
       except Exception as e:
           print(f"Errore API OpenSky per {code}: {e}", flush=True)
-
           continue
-
 
       dati_salvati = False
 
@@ -274,13 +268,10 @@ def get_average_flights(airport_code, days):
 def check_flight_conditions():
     conn = None
     cursor = None
-    alerts = []  # Lista per salvare i risultati delle condizioni verificate
+    alerts = []
 
     try:
         conn, cursor = connect()
-
-        # 1. Recupera tutti i profili di interesse
-        # Assumiamo che la tabella Interessi abbia le colonne: email, airport, mode, high_value, low_value
         query_interessi = "SELECT email, airport, mode, high_value, low_value FROM Interessi"
         cursor.execute(query_interessi)
         interessi = cursor.fetchall()
@@ -288,19 +279,13 @@ def check_flight_conditions():
         for profilo in interessi:
             email, airport, mode, high_val, low_val = profilo
 
-            # 2. Determina quale tabella e quale colonna interrogare in base al 'mode'
-            # Assunzione: mode 0 = Arrivi, mode 1 = Partenze
             if mode == 0:
-                # Per gli arrivi cerchiamo 'Final_Airport' (destinazione) o 'Airport' se è l'aeroporto di riferimento
-                # Basandomi sulla tua funzione precedente: Flight_Data_Arrives -> WHERE Final_Airport = %s
                 table = "Flight_Data_Arrives"
                 where_col = "Final_Airport"
             else:
-                # Per le partenze: Flight_Data_Departures -> WHERE Airport = %s
                 table = "Flight_Data_Departures"
                 where_col = "Airport"
 
-            # 3. Recupera i voli per contarli e ottenere le info
             query_voli = f"""
                 SELECT Airport, Arrive_Time, Departure_Time, Final_Airport, Flight_Code 
                 FROM {table} 
@@ -312,13 +297,11 @@ def check_flight_conditions():
             count = len(voli)
             condizione_superata = None
 
-            # 4. Verifica le condizioni
             if count > high_val:
                 condizione_superata = 'HIGH_VALUE_EXCEEDED'
             elif count < low_val:
                 condizione_superata = 'LOW_VALUE_REACHED'
 
-            # 5. Se una condizione è soddisfatta, salva le info
             if condizione_superata:
                 alert_info = {
                     'email': email,
@@ -340,25 +323,14 @@ def check_flight_conditions():
 
 
 def check_fallback_api(client_id, client_secret):
-    """
-    Tenta di chiamare la API veloce per un singolo volo.
-    Restituisce True se ha successo, False se il Circuit Breaker si apre.
-    """
     try:
         token = api.get_token(client_id, client_secret)
-
-        # Sostituisci "A4C9B4" con un codice ICAO di un volo noto che usi per il test
-        # Stiamo usando il Circuit Breaker per proteggere anche questa API di check!
         cb.call(api.get_single_flight, token, "A4C9B4")
-
-        # Se la chiamata ha successo e ritorna un risultato valido
         return True
 
     except CircuitBreakerOpenException:
-        # Se il CB si apre qui, significa che anche l'API di check non funziona
         return False
 
     except Exception as e:
-        # Qualsiasi altro errore (es. fallimento del token)
         print(f"Errore nel check fallback: {e}", flush=True)
         return False

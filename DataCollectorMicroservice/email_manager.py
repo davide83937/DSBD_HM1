@@ -21,7 +21,6 @@ def send_email(destinatario, corpo):
     context = ssl.create_default_context()
 
     try:
-        # Usa la porta 465 per SSL
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
             server.login(sender_email, password)
             server.send_message(msg)

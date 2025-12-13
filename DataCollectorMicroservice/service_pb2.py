@@ -17,12 +17,8 @@ _runtime_version.ValidateProtobufRuntimeVersion(
     '',
     'service.proto'
 )
-# @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
-
-
-
 
 DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rservice.proto\"!\n\x10SendEmailMessage\x12\r\n\x05\x65mail\x18\x01 \x01(\t\"0\n\x10UserCheckMessage\x12\r\n\x05\x65mail\x18\x01 \x01(\t\x12\r\n\x05token\x18\x02 \x01(\t\"/\n\x0cUserResponse\x12\x0e\n\x06status\x18\x01 \x01(\x05\x12\x0f\n\x07message\x18\x02 \x01(\t2|\n\x0bUserService\x12-\n\tcheckUser\x12\x11.UserCheckMessage\x1a\r.UserResponse\x12>\n\x1a\x64\x65lete_interestes_by_email\x12\x11.SendEmailMessage\x1a\r.UserResponseb\x06proto3')
 

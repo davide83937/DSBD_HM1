@@ -16,9 +16,9 @@ consumer.subscribe([k.topic1])
 polling_config = {"interval": 43200}
 MODE_MAIN = "MAIN"
 MODE_FALLBACK = "FALLBACK"
-api_mode = MODE_MAIN # Si parte sempre in modalità principale
+api_mode = MODE_MAIN
 
-# Funzione helper per cambiare l'intervallo
+
 def set_polling_interval(seconds):
     global polling_config
     if polling_config["interval"] != seconds:
@@ -42,29 +42,20 @@ def backgroung_downloading_flights():
                 set_polling_interval(43200)
             elif api_mode == MODE_FALLBACK:
                 print("Modalità FALLBACK: Tentativo di check veloce (polling 60s).", flush=True)
-                # Tenta la chiamata veloce tramite la fallback API
                 success = db.check_fallback_api(CLIENT_ID, CLIENT_SECRET)
-
                 if success:
-            # Ritorno al normale funzionamento!
                     print("Fallback API SUCCESS. Ritorno alla modalità MAIN.", flush=True)
                     api_mode = MODE_MAIN
-                    set_polling_interval(43200)  # Ritorna all'intervallo di 12 ore
+                    set_polling_interval(43200)
                 else:
-                   # Fallback API non funziona, continua a riprovare velocemente
                     set_polling_interval(60)
-
-            # CATTURA L'ECCEZIONE DEL CIRCUIT BREAKER
         except CircuitBreakerOpenException:
-           # Succede solo quando db.download_flights fallisce per la prima volta
            print("Circuit Breaker OPEN. Passaggio immediato alla modalità FALLBACK.", flush=True)
            api_mode = MODE_FALLBACK
-           set_polling_interval(60)  # Polling veloce (es. 60 secondi)
+           set_polling_interval(60)
         except Exception as e:
            print(f"Errore generale nel loop: {e}", flush=True)
-           set_polling_interval(60)  # Rallenta comunque per sicurezza
-
-        # Il thread si ferma per l'intervallo attuale
+           set_polling_interval(60)
         time.sleep(polling_config["interval"])
 
 def start_downloading_flights():

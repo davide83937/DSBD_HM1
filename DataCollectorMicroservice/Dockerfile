@@ -10,7 +10,6 @@ COPY . .
 RUN sed -i 's/\r$//g' entrypoint.sh
 RUN chmod +x entrypoint.sh
 
-# Esponi porte (Flask e gRPC)
 EXPOSE 5005 50052
 
 CMD ["./entrypoint.sh"]

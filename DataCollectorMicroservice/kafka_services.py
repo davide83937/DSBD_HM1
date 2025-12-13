@@ -30,7 +30,7 @@ def create_consumer(group_id):
         'bootstrap.servers': bootstrap_servers,
         'group.id': group_id,
         'auto.offset.reset': 'earliest',
-        'enable.auto.commit': False,  # Commit manuale (ok, ma ricordati di farlo!)
+        'enable.auto.commit': False,
         'max.poll.interval.ms': 300000,
     }
     return Consumer(consumer_config)
