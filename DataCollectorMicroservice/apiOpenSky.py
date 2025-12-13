@@ -20,27 +20,27 @@ def get_token(client_id, client_secret):
     resp.raise_for_status()
     return resp.json()["access_token"]
 
-i = 0
+#i = 0
 
 def get_info_flight(token, airport, begin_ts, end_ts, type):
-    global i
+    #global i
     url = f"https://opensky-network.org/api/flights/{type}?airport={airport}&begin={begin_ts}&end={end_ts}"
     url1 = f"https://opensky-network.org/api/flights/{type}?airpor={airport}&begin={begin_ts}&end={end_ts}"
 
     """ TEST """
-    if i < 3:
+    """if i < 3:
         url2 = url1
         i = i + 1
     else:
         url2 = url
         i = i + 1
         if i > 20:
-            i = 0
+            i = 0"""
 
     headers = {"Authorization": f"Bearer {token}"}
-    resp = requests.get(url2, headers=headers)
+    resp = requests.get(url, headers=headers)
     if resp.status_code == 200:
-        print(f"APPOSTO: {i}", flush=True)
+        #print(f"APPOSTO: {i}", flush=True)
         return resp.json()
     elif resp.status_code == 404:
         return []
