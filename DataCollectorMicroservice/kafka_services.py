@@ -10,9 +10,6 @@ timestamp = ""
 value = "Aggiornamento dei voli effettuato"
 message = {'timestamp': datetime.now().isoformat(), 'value': value}
 
-def return_message(utente, airport, condition):
-    return {'utente': utente, 'airport': airport, 'condition': condition }
-
 bootstrap_servers = os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'kafka_examples:9092')
 
 producer_config = {
@@ -21,6 +18,9 @@ producer_config = {
     'retries': 3,
     'linger.ms': 10,
 }
+
+def return_message(utente, airport, condition):
+    return {'utente': utente, 'airport': airport, 'condition': condition }
 
 def create_producer():
     return Producer(producer_config)

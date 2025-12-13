@@ -21,7 +21,7 @@ def background_cancelling_flights():
 def backgroung_downloading_flights():
     while True:
         db.download_flights(CLIENT_ID, CLIENT_SECRET)
-        time.sleep(10)
+        time.sleep(43200)
 
 def start_downloading_flights():
     worker = threading.Thread(target=backgroung_downloading_flights)
@@ -52,8 +52,6 @@ def start_update_timestamp():
     worker = threading.Thread(target=background_update_timestamp_update)
     worker.daemon = True
     worker.start()
-
-
 
 
 appl = Flask(__name__)

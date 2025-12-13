@@ -27,7 +27,6 @@ class CircuitBreaker:
             try:
                 result = func(*args, **kwargs)
             except self.expected_exception as e:
-                # Function raised an expected exception; increment failure count
                 self.failure_count += 1
                 self.last_failure_time = time.time()  # Update the last failure timestamp
                 if self.failure_count >= self.failure_threshold:

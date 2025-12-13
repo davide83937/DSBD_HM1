@@ -131,6 +131,7 @@ def download_flights(client_id, client_secret):
         lista_interessi.extend(response)
     lista_partenze = []
     lista_arrivi = []
+    aggiornamento_convalidato = True
     token = api.get_token(client_id, client_secret)
     start_time = datetime.now() - timedelta(days=1)
     start_time = int(start_time.timestamp())
@@ -146,25 +147,30 @@ def download_flights(client_id, client_secret):
       except CircuitBreakerOpenException:
           # Questo verrà stampato SOLO quando il circuito è aperto
           print(f"Circuito APERTO per {code}. Chiamata bloccata per sicurezza.", flush=True)
+          aggiornamento_convalidato = False
           continue
       except Exception as e:
           print(f"Errore API OpenSky per {code}: {e}", flush=True)
-          # Continua con il prossimo aeroporto invece di morire
+          aggiornamento_convalidato = False
+
           continue
 
-    bool_partenze = False
-    bool_arrivi = False
+    if aggiornamento_convalidato:
+        dati_salvati = False
 
-    if lista_partenze != []:
-        insertOnDatabase(lista_partenze, DEPARTURES_TABLE)
-        bool_partenze = True
+        if lista_partenze:
+            insertOnDatabase(lista_partenze, DEPARTURES_TABLE)
+            dati_salvati = True
 
-    if lista_arrivi != []:
-        insertOnDatabase(lista_arrivi, ARRIVALS_TABLE)
-        bool_arrivi = True
+        if lista_arrivi:
+            insertOnDatabase(lista_arrivi, ARRIVALS_TABLE)
+            dati_salvati = True
 
-    if bool_arrivi or bool_partenze:
-      k.delivery_messagge(producer, k.topic1, k.message)
+        # Kafka parte solo se tutto è ok e abbiamo salvato qualcosa
+        if dati_salvati:
+            k.delivery_messagge(producer, k.topic1, k.message)
+
+
 
 
 

@@ -1,6 +1,5 @@
 from datetime import datetime
 import requests
-import random
 
 
 CLIENT_ID = "davidepanto@gmail.com-api-client"
@@ -26,10 +25,6 @@ def get_token(client_id, client_secret):
 def get_info_flight(token, airport, begin_ts, end_ts, type):
 
     url = f"https://opensky-network.org/api/flights/{type}?airport={airport}&begin={begin_ts}&end={end_ts}"
-    url1 = f"https://opensky-network.org/api/flights/{type}?airprt={airport}&begin={begin_ts}&end={end_ts}"
-    valore = random.choice([True, False])
-    if valore:
-       url = url1
     headers = {"Authorization": f"Bearer {token}"}
     resp = requests.get(url, headers=headers)
     if resp.status_code == 200:
