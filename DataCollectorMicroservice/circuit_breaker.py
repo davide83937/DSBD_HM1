@@ -12,7 +12,6 @@ class CircuitBreaker:
         self.lock = threading.Lock()  # Lock to ensure thread-safe operations
 
     def call(self, func, *args, **kwargs):
-
         with self.lock:
             if self.state == 'OPEN':
                 time_since_failure = time.time() - self.last_failure_time

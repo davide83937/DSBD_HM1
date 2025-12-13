@@ -7,6 +7,7 @@ import circuit_breaker
 from circuit_breaker import CircuitBreakerOpenException
 
 
+
 DEPARTURES_TABLE = "Flight_Data_Departures"
 ARRIVALS_TABLE = "Flight_Data_Arrives"
 
@@ -144,9 +145,11 @@ def download_flights(client_id, client_secret):
         else:
             modalità = "arrival"
             lista_arrivi.extend(cb.call(api.get_info_flight,token, code, start_time, time_now, modalità))
+
       except CircuitBreakerOpenException:
-          aggiornamento_convalidato = False
-          continue
+          raise
+          #aggiornamento_convalidato = False
+          #continue
       except Exception as e:
           print(f"Errore API OpenSky per {code}: {e}", flush=True)
           aggiornamento_convalidato = False
@@ -333,3 +336,28 @@ def check_flight_conditions():
     finally:
         if conn is not None:
             disconnect(conn, cursor)
+
+
+def check_fallback_api(client_id, client_secret):
+    """
+    Tenta di chiamare la API veloce per un singolo volo.
+    Restituisce True se ha successo, False se il Circuit Breaker si apre.
+    """
+    try:
+        token = api.get_token(client_id, client_secret)
+
+        # Sostituisci "A4C9B4" con un codice ICAO di un volo noto che usi per il test
+        # Stiamo usando il Circuit Breaker per proteggere anche questa API di check!
+        cb.call(api.get_single_flight, token, "A4C9B4")
+
+        # Se la chiamata ha successo e ritorna un risultato valido
+        return True
+
+    except CircuitBreakerOpenException:
+        # Se il CB si apre qui, significa che anche l'API di check non funziona
+        return False
+
+    except Exception as e:
+        # Qualsiasi altro errore (es. fallimento del token)
+        print(f"Errore nel check fallback: {e}", flush=True)
+        return False

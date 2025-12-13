@@ -1,4 +1,5 @@
 from datetime import datetime
+import time
 import requests
 
 
@@ -59,3 +60,26 @@ def get_data(start_str):
    except ValueError:
       exit()
 
+
+def get_single_flight(token, icao24):
+    """
+    Recupera lo stato attuale di un singolo transponder ICAO24 per un check veloce.
+    Aggiungiamo DEBUG per vedere se fallisce.
+    """
+    headers = {"Authorization": f"Bearer {token}"}
+    time_now = int(time.time())
+
+    # Endpoint states/all con filtro ICAO24
+    url = f"https://opensky-network.org/api/states/all?icao24={icao24}&time={time_now}"
+
+    # DEBUG: Stampa l'URL esatto che stai chiamando
+    print(f"DEBUG FALLBACK URL: {url}", flush=True)
+
+    resp = requests.get(url, headers=headers)
+
+    # DEBUG: Stampa il codice di stato prima di sollevare l'errore
+    print(f"DEBUG FALLBACK STATUS: {resp.status_code}", flush=True)
+
+    resp.raise_for_status()  # Solleva un'eccezione se lo stato HTTP non è 2xx
+
+    return resp.json().get('states', [])
