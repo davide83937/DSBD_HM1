@@ -325,7 +325,7 @@ def check_flight_conditions():
 def check_fallback_api(client_id, client_secret):
     try:
         token = api.get_token(client_id, client_secret)
-        cb.call(api.get_single_flight, token, "A4C9B4")
+        cb.call(api.get_single_flight, token, "OMDB")
         return True
 
     except CircuitBreakerOpenException:

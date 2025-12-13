@@ -61,10 +61,11 @@ def get_data(start_str):
 
 def get_single_flight(token, icao24):
     headers = {"Authorization": f"Bearer {token}"}
-    time_now = int(time.time())
-    url = f"https://opensky-network.org/api/states/all?icao24={icao24}&time={time_now}"
-    print(f"DEBUG FALLBACK URL: {url}", flush=True)
+    end_ts = int(time.time())
+    begin_ts = end_ts - 600
+    url = f"https://opensky-network.org/api/flights/arrival?airport={icao24}&begin={begin_ts}&end={end_ts}"
+    print(f"DEBUG FALLBACK URL (Light Historical): {url}", flush=True)
     resp = requests.get(url, headers=headers)
     print(f"DEBUG FALLBACK STATUS: {resp.status_code}", flush=True)
     resp.raise_for_status()
-    return resp.json().get('states', [])
+    return resp.json()
