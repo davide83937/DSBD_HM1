@@ -40,7 +40,7 @@ def get_info_flight(token, airport, begin_ts, end_ts, type):
     headers = {"Authorization": f"Bearer {token}"}
     resp = requests.get(url, headers=headers)
     if resp.status_code == 200:
-        print(f"APPOSTO: {i}", flush=True)
+        #print(f"APPOSTO: {i}", flush=True)
         return resp.json()
     elif resp.status_code == 404:
         return []
