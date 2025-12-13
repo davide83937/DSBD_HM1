@@ -151,9 +151,20 @@ def download_flights(client_id, client_secret):
           print(f"Errore API OpenSky per {code}: {e}", flush=True)
           # Continua con il prossimo aeroporto invece di morire
           continue
-    insertOnDatabase(lista_partenze, DEPARTURES_TABLE)
-    insertOnDatabase(lista_arrivi, ARRIVALS_TABLE)
-    k.delivery_messagge(producer, k.topic1, k.message)
+
+    bool_partenze = False
+    bool_arrivi = False
+
+    if lista_partenze != []:
+        insertOnDatabase(lista_partenze, DEPARTURES_TABLE)
+        bool_partenze = True
+
+    if lista_arrivi != []:
+        insertOnDatabase(lista_arrivi, ARRIVALS_TABLE)
+        bool_arrivi = True
+
+    if bool_arrivi or bool_partenze:
+      k.delivery_messagge(producer, k.topic1, k.message)
 
 
 
