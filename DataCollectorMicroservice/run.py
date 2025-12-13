@@ -21,7 +21,7 @@ def background_cancelling_flights():
 def backgroung_downloading_flights():
     while True:
         db.download_flights(CLIENT_ID, CLIENT_SECRET)
-        time.sleep(43200)
+        time.sleep(10)
 
 def start_downloading_flights():
     worker = threading.Thread(target=backgroung_downloading_flights)

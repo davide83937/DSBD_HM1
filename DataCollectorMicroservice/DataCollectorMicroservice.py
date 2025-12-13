@@ -18,14 +18,23 @@ DEPARTURE = "departure"
 @app.route("/check_time_update", methods=["POST"])
 def check_time_update():
     try:
-        email = request.json["email"]
-        t = k.timestamp
-        return {"message": f"{t}"}
-
+        data = request.json
+        email = data["email"]
+        token = data["token"]
+        stub = grpc_manager.get_stub()
+        response = stub.checkUser(service_pb2.UserCheckMessage(email=email, token=token))
+        if response.status == 0:
+          t = k.timestamp
+          return {"message": f"{t}"}
+        else:
+          return {"message": "Utente non loggato"}
+    except grpc.RpcError as e:
+        e = e.code()
+        if e == grpc.StatusCode.UNAVAILABLE:
+              return {"message": f"Il canale grpc è spento o irraggiungibile: {e}"}, 503
     except KeyError as e:
-      campo_mancante = e.args[0]
-      return {"error": f"Manca il campo obbligatorio: {campo_mancante}"}, 400
-
+        campo_mancante = e.args[0]
+        return {"error": f"Manca il campo obbligatorio: {campo_mancante}"}, 400
 
 
 @app.route("/send_interest", methods=["POST"])
@@ -55,6 +64,7 @@ def sendInterest():
     except KeyError as e:
         campo_mancante = e.args[0]
         return {"error": f"Manca il campo obbligatorio: {campo_mancante}"}, 400
+
 
 @app.route("/delete_interest", methods=["POST"])
 def delete_interest():
@@ -154,6 +164,7 @@ def get_last_one():
     except KeyError as e:
         campo_mancante = e.args[0]
         return {"error": f"Manca il campo obbligatorio: {campo_mancante}"}, 400
+
 
 @app.route("/get_avgs", methods=["POST"])
 def get_avgs():

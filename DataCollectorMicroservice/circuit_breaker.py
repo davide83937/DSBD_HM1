@@ -2,7 +2,7 @@ import time
 import threading
 
 class CircuitBreaker:
-    def __init__(self, failure_threshold=5, recovery_timeout=30, expected_exception=Exception):
+    def __init__(self, failure_threshold=2, recovery_timeout=15, expected_exception=Exception):
         self.failure_threshold = failure_threshold  # Threshold for failures to open the circuit
         self.recovery_timeout = recovery_timeout  # Timeout before attempting to reset the circuit
         self.expected_exception = expected_exception  # Exception type to monitor
@@ -18,7 +18,6 @@ class CircuitBreaker:
                 time_since_failure = time.time() - self.last_failure_time
                 if time_since_failure > self.recovery_timeout:
                     self.state = 'HALF_OPEN'
-                    print('Circuit breaker is halfopeneed', flush=True)
                     #raise CircuitBreakerOpenException
                 else:
                     print('Circuit breaker is open yet', flush=True)

@@ -8,7 +8,6 @@ CLIENT_SECRET = "ewpHTQ27KoTGv4vMoCyLT8QrIt4sLr3z"
 
 
 def get_token(client_id, client_secret):
-    """Ottieni token Bearer da OpenSky"""
     url = "https://auth.opensky-network.org/auth/realms/opensky-network/protocol/openid-connect/token"
     data = {
         "grant_type": "client_credentials",
@@ -20,14 +19,25 @@ def get_token(client_id, client_secret):
     resp.raise_for_status()
     return resp.json()["access_token"]
 
-
+i = 0
 
 def get_info_flight(token, airport, begin_ts, end_ts, type):
-
+    global i
     url = f"https://opensky-network.org/api/flights/{type}?airport={airport}&begin={begin_ts}&end={end_ts}"
+    url1 = f"https://opensky-network.org/api/flights/{type}?airpor={airport}&begin={begin_ts}&end={end_ts}"
+    if i < 3:
+        url2 = url1
+        i = i + 1
+    else:
+        url2 = url
+        i = i + 1
+        if i > 5:
+            i = 0
+
     headers = {"Authorization": f"Bearer {token}"}
-    resp = requests.get(url, headers=headers)
+    resp = requests.get(url2, headers=headers)
     if resp.status_code == 200:
+        print(f"APPOSTO: {i}", flush=True)
         return resp.json()
     elif resp.status_code == 404:
         return []
@@ -39,14 +49,11 @@ def get_info_flight(token, airport, begin_ts, end_ts, type):
 def get_data(start_str):
    start_str = start_str.strip()
    end_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-   print("----------------------------")
    date_format = "%Y-%m-%d %H:%M:%S"
    try:
        start_time = int(datetime.strptime(start_str, date_format).timestamp())
        end_time = int(datetime.strptime(end_str, date_format).timestamp())
-       print(end_time)
        return start_time, end_time
    except ValueError:
-      print("\nERRORE: Formato data/ora non valido. Controlla il formato YYYY-MM-DD HH:MM:SS.")
       exit()
 

@@ -18,7 +18,6 @@ def send_email(destinatario, corpo):
     msg['Subject'] = "LIMITE VOLI SUPERATO"
     msg['From'] = sender_email
     msg['To'] = destinatario
-
     context = ssl.create_default_context()
 
     try:
