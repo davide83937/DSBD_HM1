@@ -148,7 +148,7 @@ def download_flights(client_id, client_secret):
       except CircuitBreakerOpenException:
           raise
       except Exception as e:
-          print(f"Errore API OpenSky per {code}: {e}", flush=True)
+          print(f"Errore API in OpenSky per {code}: {e}", flush=True)
           continue
 
       dati_salvati = False
