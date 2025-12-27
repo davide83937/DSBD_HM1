@@ -25,7 +25,7 @@ def return_message(utente, airport, condition):
 def create_producer():
     return Producer(producer_config)
 
-def create_consumer(group_id):
+def create_consumer(group_id, topic_name):
     consumer_config = {
         'bootstrap.servers': bootstrap_servers,
         'group.id': group_id,
@@ -33,8 +33,9 @@ def create_consumer(group_id):
         'enable.auto.commit': False,
         'max.poll.interval.ms': 300000,
     }
-    return Consumer(consumer_config)
-
+    consumer = Consumer(consumer_config)
+    consumer.subscribe([topic_name])  # <--- Usa il parametro!
+    return consumer
 
 def delivery_report(err, msg):
     if err:

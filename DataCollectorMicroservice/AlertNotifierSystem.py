@@ -4,7 +4,7 @@ import email_manager as mail
 
 NAME = 2
 
-consumer = k.create_consumer("group3")
+consumer = k.create_consumer("notifier-group", k.topic2)
 consumer.subscribe([k.topic2])
 
 def watch_kafka():

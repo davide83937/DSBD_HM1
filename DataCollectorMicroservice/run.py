@@ -12,7 +12,7 @@ CLIENT_ID = "davidepanto@gmail.com-api-client"
 CLIENT_SECRET = "ewpHTQ27KoTGv4vMoCyLT8QrIt4sLr3z"
 NAME = 1
 
-consumer = k.create_consumer("group1")
+consumer = k.create_consumer("alert-group", k.topic1)
 consumer.subscribe([k.topic1])
 
 polling_config = {"interval": 43200}
