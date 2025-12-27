@@ -1,0 +1,50 @@
+# --- Alert System Deployment ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alert-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alert-system
+  template:
+    metadata:
+      labels:
+        app: alert-system
+    spec:
+      containers:
+        - name: alert-system
+          image: alert_system:latest
+          imagePullPolicy: Never
+          command: ["python", "AlertSystem.py"]
+          env:
+            - name: DB_HOST
+              value: "mysql-service"
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "kafka-service:9092"
+
+---
+# --- Notifier System Deployment ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notifier-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notifier-system
+  template:
+    metadata:
+      labels:
+        app: notifier-system
+    spec:
+      containers:
+        - name: notifier-system
+          image: notifier_system:latest
+          imagePullPolicy: Never
+          command: ["python", "AlertNotifierSystem.py"]
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "kafka-service.default.svc.cluster.local:9092"

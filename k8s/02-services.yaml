@@ -1,0 +1,97 @@
+# --- User Manager Service ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: usermanager-service
+spec:
+  ports:
+    - port: 5000
+      name: http
+    - port: 50051
+      name: grpc
+  selector:
+    app: usermanager
+
+---
+# --- User Manager Deployment ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: usermanager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: usermanager
+  template:
+    metadata:
+      labels:
+        app: usermanager
+    spec:
+      containers:
+        - name: usermanager
+          image: usermanager:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 5000
+            - containerPort: 50051
+          env:
+            - name: DB_HOST
+              value: "mysql-service"
+            - name: REDIS_HOST
+              value: "redis-service"
+            - name: TARGET_GRPC_HOST
+              value: "datacollector-service:50052"
+
+---
+# --- Data Collector Service ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: datacollector-service
+spec:
+  ports:
+    - port: 5005
+      name: http
+    - port: 50052
+      name: grpc
+    - port: 9999
+      name: metrics
+  selector:
+    app: datacollector
+
+---
+# --- Data Collector Deployment ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: datacollector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: datacollector
+  template:
+    metadata:
+      labels:
+        app: datacollector
+    spec:
+      containers:
+        - name: datacollector
+          image: datacollector:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 5005
+            - containerPort: 50052
+            - containerPort: 9999
+          env:
+            - name: DB_HOST
+              value: "mysql-service.default.svc.cluster.local"
+            - name: TARGET_GRPC_HOST
+              value: "usermanager-service:50051"
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "kafka-service.default.svc.cluster.local:9092"
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName

@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: phpmyadmin-service
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30081 # Useremo la porta 30081 per la GUI
+  selector:
+    app: phpmyadmin
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: phpmyadmin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: phpmyadmin
+  template:
+    metadata:
+      labels:
+        app: phpmyadmin
+    spec:
+      containers:
+        - name: phpmyadmin
+          image: phpmyadmin:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: PMA_HOST
+              value: "mysql-service" # Punta al tuo servizio MySQL
+            - name: PMA_PORT
+              value: "3306"
+            - name: MYSQL_ROOT_PASSWORD
+              value: "root" # La password che hai impostato
