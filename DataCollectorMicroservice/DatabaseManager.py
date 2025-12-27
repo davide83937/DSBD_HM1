@@ -71,6 +71,11 @@ def insertOnDatabase(lista, table):
                aeroporto_finale = (flight.get("estArrivalAirport") or "").strip()
                partenza_ts = flight.get("firstSeen")
                arrivo_ts = flight.get("lastSeen")
+
+               if partenza_ts is None or arrivo_ts is None:
+                   print(f"Skipping flight {codice_volo}: timestamp mancante", flush=True)
+                   continue
+
                partenza_dt = datetime.fromtimestamp(partenza_ts)
                arrivo_dt = datetime.fromtimestamp(arrivo_ts)
                cursor.execute(insert_query, (aeroporto, codice_volo, aeroporto_finale, partenza_dt, arrivo_dt))
