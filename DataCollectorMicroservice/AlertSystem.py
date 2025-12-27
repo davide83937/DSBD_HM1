@@ -5,7 +5,7 @@ import DatabaseManager as db
 
 NAME = 1
 
-consumer = consumer = k.create_consumer("alert-group", k.topic1)
+consumer = k.create_consumer("alert-group-v5", k.topic1)
 consumer.subscribe([k.topic1])
 
 producer = k.create_producer()
@@ -16,9 +16,9 @@ def background_timestamp_update():
         print("DEBUG: Alert System in attesa di messaggi...", flush=True)  # AGGIUNGI QUESTA
         result = k.check_message_kafka(consumer, NAME)
         if result:
+            print(f"Messaggio ricevuto! Controllo voli per l'aeroporto...", flush=True)
             alert = []
             alert = db.check_flight_conditions()
-            print(f"Messaggio ricevuto! Controllo voli per l'aeroporto...", flush=True)
             for a in alert:
                 message = k.return_message(a['email'], a['airport'], a['condition'])
                 k.delivery_messagge(producer, k.topic2, message)
