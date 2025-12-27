@@ -5,6 +5,8 @@ import apiOpenSky as api
 import kafka_services as k
 import circuit_breaker
 from circuit_breaker import CircuitBreakerOpenException
+import metrics
+import time
 
 
 
@@ -130,40 +132,49 @@ def download_flights(client_id, client_secret):
         return
     else:
         lista_interessi.extend(response)
-    lista_partenze = []
-    lista_arrivi = []
+    #lista_partenze = []
+    #lista_arrivi = []
     token = api.get_token(client_id, client_secret)
     start_time = datetime.now() - timedelta(days=1)
     start_time = int(start_time.timestamp())
     time_now = int(datetime.now().timestamp())
+    #with metrics.FLIGHTS_DOWNLOAD_TIME.time():
+    tempo_download = 0
     for code, mode in lista_interessi:
+      lista_partenze = []
+      lista_arrivi = []
       try:
+        valore = 0
         if mode:
             modalità = "departure"
+            start_chiamata = time.perf_counter()
             lista_partenze.extend(cb.call(api.get_info_flight,token, code, start_time, time_now, modalità))
+            valore = time.perf_counter() - start_chiamata
+            tempo_download = tempo_download + valore
         else:
             modalità = "arrival"
+            start_chiamata = time.perf_counter()
             lista_arrivi.extend(cb.call(api.get_info_flight,token, code, start_time, time_now, modalità))
-
+            valore = time.perf_counter() - start_chiamata
+            tempo_download = tempo_download + valore
       except CircuitBreakerOpenException:
           raise
       except Exception as e:
           print(f"Errore API in OpenSky per {code}: {e}", flush=True)
           continue
-
       dati_salvati = False
-
       if lista_partenze:
             insertOnDatabase(lista_partenze, DEPARTURES_TABLE)
             dati_salvati = True
-
       if lista_arrivi:
             insertOnDatabase(lista_arrivi, ARRIVALS_TABLE)
             dati_salvati = True
-
       if dati_salvati:
+            total_flights = len(lista_partenze) + len(lista_arrivi)
+          # Aggiorniamo la metrica dopo il download
+            #metrics.FLIGHTS_COUNT.labels(service='datacollector').set(total_flights)
             k.delivery_messagge(producer, k.topic1, k.message)
-
+    metrics.FLIGHTS_DOWNLOAD_TIME.labels(service='datacollector', resource='total_time').set(tempo_download)
 
 
 

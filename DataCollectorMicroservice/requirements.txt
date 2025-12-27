@@ -5,3 +5,4 @@ mysql-connector-python
 requests
 protobuf
 confluent-kafka
+prometheus-client

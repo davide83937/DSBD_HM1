@@ -79,9 +79,42 @@ services:
       - PYTHONUNBUFFERED=1
     ports:
       - "50052:50052"
+      - "9999:9999"
+
     networks:
       - app_network
       - existing_db_net
+    # MONITORAGGIO: Prometheus
+  prometheus:
+      image: prom/prometheus:v2.45.0
+      container_name: prometheus
+      volumes:
+        - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+        - prometheus_data:/prometheus
+      ports:
+        - "53120:9090" # Mappatura come da tuo esempio
+      networks:
+        - app_network
+      restart: always
+
+    # MONITORAGGIO: cAdvisor
+  cadvisor:
+      image: gcr.io/cadvisor/cadvisor:v0.47.0 # Immagine aggiornata per compatibilità cgroups v2
+      container_name: cadvisor
+      privileged: true # Necessario per accedere ad alcuni parametri di sistema
+      devices:
+        - /dev/kmsg:/dev/kmsg # Aiuta cAdvisor a leggere i log del kernel
+      volumes:
+        - /:/rootfs:ro
+        - /var/run:/var/run:rw
+        - /sys:/sys:ro
+        - /var/lib/docker/:/var/lib/docker:ro
+        - /sys/fs/cgroup:/sys/fs/cgroup:ro # Mount esplicito per i cgroups
+      ports:
+        - "8080:8080"
+      networks:
+        - app_network
+      restart: always
 
   alert_system:
       build: ./DataCollectorMicroservice
@@ -121,3 +154,5 @@ networks:
 
 volumes:
   kafka-data:
+# Questa è la sezione che mancava e causava l'errore
+  prometheus_data: {}

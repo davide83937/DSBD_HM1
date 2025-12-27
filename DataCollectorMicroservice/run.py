@@ -1,6 +1,8 @@
 import time
 import kafka_services as k
 from flask import Flask
+import metrics
+import prometheus_client
 from DataCollectorMicroservice import app
 import threading
 import DatabaseManager as db
@@ -93,6 +95,12 @@ appl = Flask(__name__)
 appl.register_blueprint(app)
 
 if __name__ == "__main__":
+    prometheus_client.start_http_server(9999)
+    print("Prometheus metrics available on port 9999", flush=True)
+    metrics.FLIGHTS_DOWNLOAD_TIME.labels(service='datacollector', resource='flight_departure').set(0)
+    metrics.FLIGHTS_DOWNLOAD_TIME.labels(service='datacollector', resource='flight_arrive').set(0)
+    metrics.FLIGHTS_DOWNLOAD_TIME.labels(service='datacollector', resource='total_time').set(0)
+    print("Prometheus metrics initialized to 0", flush=True)
     start_cancelling_task()
     start_downloading_flights()
     start_update_timestamp()
