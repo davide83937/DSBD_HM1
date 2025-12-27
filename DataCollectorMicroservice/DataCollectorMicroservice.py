@@ -6,6 +6,7 @@ from flask import Blueprint
 import grpc_manager
 import kafka_services as k
 
+
 app = Blueprint('app', __name__)
 
 CLIENT_ID = "davidepanto@gmail.com-api-client"

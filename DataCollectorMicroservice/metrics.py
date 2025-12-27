@@ -1,13 +1,16 @@
 import prometheus_client
 
-# ... (altri import esistenti)
 
 # Definiamo la metrica Gauge
-FLIGHTS_DOWNLOAD_TIME = prometheus_client.Gauge(
-    'datacollector_download_time',
+FLIGHTS_DOWNLOAD_DATA = prometheus_client.Gauge(
+    'datacollector_download_data',
     'Tempo di download',
-    ['service', 'resource'],
-
+    ['service', 'node', 'resource'],
 )
 
+NUM_FLIGHTS_DOWNLOADED = prometheus_client.Counter(
+    'datacollector_num_flights_downloaded',
+    'Numero di voli scaricati',
+    ['service', 'node', 'resource'],
+)
 

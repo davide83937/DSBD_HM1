@@ -7,12 +7,11 @@ import circuit_breaker
 from circuit_breaker import CircuitBreakerOpenException
 import metrics
 import time
+import platform
 
-
-
+NODE_NAME = os.getenv('NODE_NAME', platform.node())
 DEPARTURES_TABLE = "Flight_Data_Departures"
 ARRIVALS_TABLE = "Flight_Data_Arrives"
-
 producer = k.create_producer()
 cb = circuit_breaker.CircuitBreaker()
 
@@ -143,44 +142,47 @@ def download_flights(client_id, client_secret):
     start_time = datetime.now() - timedelta(days=1)
     start_time = int(start_time.timestamp())
     time_now = int(datetime.now().timestamp())
-    #with metrics.FLIGHTS_DOWNLOAD_TIME.time():
-    tempo_download = 0
-    for code, mode in lista_interessi:
-      lista_partenze = []
-      lista_arrivi = []
-      try:
-        valore = 0
-        if mode:
-            modalità = "departure"
-            start_chiamata = time.perf_counter()
-            lista_partenze.extend(cb.call(api.get_info_flight,token, code, start_time, time_now, modalità))
-            valore = time.perf_counter() - start_chiamata
-            tempo_download = tempo_download + valore
-        else:
-            modalità = "arrival"
-            start_chiamata = time.perf_counter()
-            lista_arrivi.extend(cb.call(api.get_info_flight,token, code, start_time, time_now, modalità))
-            valore = time.perf_counter() - start_chiamata
-            tempo_download = tempo_download + valore
-      except CircuitBreakerOpenException:
-          raise
-      except Exception as e:
-          print(f"Errore API in OpenSky per {code}: {e}", flush=True)
-          continue
-      dati_salvati = False
-      if lista_partenze:
-            insertOnDatabase(lista_partenze, DEPARTURES_TABLE)
-            dati_salvati = True
-      if lista_arrivi:
-            insertOnDatabase(lista_arrivi, ARRIVALS_TABLE)
-            dati_salvati = True
-      if dati_salvati:
-            total_flights = len(lista_partenze) + len(lista_arrivi)
-          # Aggiorniamo la metrica dopo il download
-            #metrics.FLIGHTS_COUNT.labels(service='datacollector').set(total_flights)
-            k.delivery_messagge(producer, k.topic1, k.message)
-    metrics.FLIGHTS_DOWNLOAD_TIME.labels(service='datacollector', resource='total_time').set(tempo_download)
-
+    try:
+        tempo_download = 0
+        n_voli = 0
+        for code, mode in lista_interessi:
+          lista_partenze = []
+          lista_arrivi = []
+          valore = 0
+          try:
+            if mode:
+                modalità = "departure"
+                start_chiamata = time.perf_counter()
+                lista_partenze.extend(cb.call(api.get_info_flight,token, code, start_time, time_now, modalità))
+                n_voli += len(lista_partenze)
+                valore = time.perf_counter() - start_chiamata
+                tempo_download = tempo_download + valore
+            else:
+                modalità = "arrival"
+                start_chiamata = time.perf_counter()
+                lista_arrivi.extend(cb.call(api.get_info_flight,token, code, start_time, time_now, modalità))
+                n_voli += len(lista_arrivi)
+                valore = time.perf_counter() - start_chiamata
+                tempo_download = tempo_download + valore
+          except CircuitBreakerOpenException:
+              raise
+          except Exception as e:
+              print(f"Errore API in OpenSky per {code}: {e}", flush=True)
+              continue
+          dati_salvati = False
+          if lista_partenze:
+                insertOnDatabase(lista_partenze, DEPARTURES_TABLE)
+                dati_salvati = True
+          if lista_arrivi:
+                insertOnDatabase(lista_arrivi, ARRIVALS_TABLE)
+                dati_salvati = True
+          if dati_salvati:
+                k.delivery_messagge(producer, k.topic1, k.message)
+    finally:
+        metrics.FLIGHTS_DOWNLOAD_DATA.labels(service='datacollector',node=NODE_NAME, resource='total_time').set(tempo_download)
+        metrics.FLIGHTS_DOWNLOAD_DATA.labels(service='datacollector',node=NODE_NAME, resource='last_n_voli').set(n_voli)
+        if n_voli > 0:
+           metrics.NUM_FLIGHTS_DOWNLOADED.labels(service='datacollector', node=NODE_NAME, resource='total_n_voli').inc(n_voli)
 
 
 
