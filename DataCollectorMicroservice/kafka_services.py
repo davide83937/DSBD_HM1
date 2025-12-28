@@ -59,7 +59,7 @@ def decode_timestamp(consumer, msg):
     data = json.loads(msg.value().decode('utf-8'))
     received_timestamp = data.get('timestamp')
     timestamp = received_timestamp
-    consumer.commit(asynchronous=False)
+    #consumer.commit(asynchronous=False)
     return True
 
 def decode_message(consumer, msg):
@@ -67,7 +67,7 @@ def decode_message(consumer, msg):
     utente = data.get('utente')
     airport = data.get('airport')
     condition = data.get('condition')
-    consumer.commit(asynchronous=False)
+    #consumer.commit(asynchronous=False)
     return utente, airport, condition
 
 def check_message_kafka(consumer, name):

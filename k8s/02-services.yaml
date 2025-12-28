@@ -9,6 +9,8 @@ spec:
       name: http
     - port: 50051
       name: grpc
+    - port: 9999
+      name: metrics
   selector:
     app: usermanager
 

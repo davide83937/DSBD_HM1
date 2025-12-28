@@ -22,6 +22,7 @@ def background_timestamp_update():
             for a in alert:
                 message = k.return_message(a['email'], a['airport'], a['condition'])
                 k.delivery_messagge(producer, k.topic2, message)
+        consumer.commit(asynchronous=False)
         time.sleep(5)
   except KeyboardInterrupt:
       print("Interruzione manuale ricevuta. Chiusura in corso...")

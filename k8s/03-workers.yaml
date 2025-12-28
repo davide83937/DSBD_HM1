@@ -18,6 +18,8 @@ spec:
           image: alert_system:latest
           imagePullPolicy: Never
           command: ["python", "AlertSystem.py"]
+          ports:
+            - containerPort: 9999
           env:
             - name: DB_HOST
               value: "mysql-service.default.svc.cluster.local"

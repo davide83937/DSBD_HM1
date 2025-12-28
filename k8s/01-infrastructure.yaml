@@ -114,6 +114,7 @@ spec:
           image: confluentinc/cp-kafka:7.4.0
           ports:
             - containerPort: 9092
+            - containerPort: 29092
           env:
             - name: KAFKA_NODE_ID
               value: "1"
@@ -124,14 +125,19 @@ spec:
             - name: KAFKA_CONTROLLER_LISTENER_NAMES
               value: "CONTROLLER"
             - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
-              value: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT"
-            # ASCOLTO: 0.0.0.0 permette a Kubernetes di inoltrare il traffico al pod
+              value: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT"
             - name: KAFKA_LISTENERS
-              value: "PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:29093"
-            # ANNUNCIO: Deve corrispondere esattamente all'indirizzo usato nei microservizi
+              value: "PLAINTEXT://0.0.0.0:9092,EXTERNAL://0.0.0.0:29092,CONTROLLER://0.0.0.0:29093"
             - name: KAFKA_ADVERTISED_LISTENERS
-              value: "PLAINTEXT://kafka-service.default.svc.cluster.local:9092"
+              value: "PLAINTEXT://kafka-service.default.svc.cluster.local:9092,EXTERNAL://localhost:29092"
             - name: KAFKA_INTER_BROKER_LISTENER_NAME
               value: "PLAINTEXT"
             - name: CLUSTER_ID
               value: "MkU3OEVBNTcwNTJENDM2Qk"
+            # --- LE 3 RIGHE SALVA-VITA ---
+            - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+              value: "1"
+            - name: KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR
+              value: "1"
+            - name: KAFKA_TRANSACTION_STATE_LOG_MIN_ISR
+              value: "1"
