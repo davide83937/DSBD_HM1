@@ -136,8 +136,6 @@ def download_flights(client_id, client_secret):
         return
     else:
         lista_interessi.extend(response)
-    #lista_partenze = []
-    #lista_arrivi = []
     token = api.get_token(client_id, client_secret)
     start_time = datetime.now() - timedelta(days=1)
     start_time = int(start_time.timestamp())

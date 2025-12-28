@@ -1,7 +1,5 @@
 import prometheus_client
 
-
-# Definiamo la metrica Gauge
 FLIGHTS_DOWNLOAD_DATA = prometheus_client.Gauge(
     'datacollector_download_data',
     'Tempo di download',

@@ -1,4 +1,3 @@
-# --- Alert System Deployment ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -29,7 +28,6 @@ spec:
               value: "kafka-service.default.svc.cluster.local:9092"
 
 ---
-# --- Notifier System Deployment ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:

@@ -7,7 +7,7 @@ spec:
   ports:
     - port: 80
       targetPort: 80
-      nodePort: 30081 # Useremo la porta 30081 per la GUI
+      nodePort: 30081
   selector:
     app: phpmyadmin
 
@@ -33,8 +33,8 @@ spec:
             - containerPort: 80
           env:
             - name: PMA_HOST
-              value: "mysql-service" # Punta al tuo servizio MySQL
+              value: "mysql-service"
             - name: PMA_PORT
               value: "3306"
             - name: MYSQL_ROOT_PASSWORD
-              value: "root" # La password che hai impostato
+              value: "root"
