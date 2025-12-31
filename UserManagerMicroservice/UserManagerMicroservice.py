@@ -8,7 +8,7 @@ import service_pb2
 import redis_script as rs
 import metrics
 import time
-import run
+
 
 app = Blueprint('app', __name__)
 
@@ -34,6 +34,11 @@ def login():
             response = db.login(email, password, True)
             if response == 0:
                 valore = time.perf_counter() - start_chiamata
+                metrics.LOGIN_LATENCY.labels(
+                    service='usermanager',
+                    node=metrics.NODE_NAME,
+                    resource='login_latency'
+                ).set(valore)
                 success = True
                 return {"message": "Login effettuato con successo"}, 200
             elif response == 2:
@@ -61,7 +66,7 @@ def login():
         if not success:
             metrics.LOGIN_COUNTER.labels(
                 service='usermanager',
-                node=run.NODE_NAME,
+                node=metrics.NODE_NAME,
                 resource=fail_reason  #
             ).inc(1)
 

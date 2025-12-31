@@ -1,4 +1,8 @@
 import prometheus_client
+import os
+import platform
+
+NODE_NAME = os.getenv('NODE_NAME', platform.node())
 
 LOGIN_LATENCY = prometheus_client.Gauge(
     'usermanager_login_response_time_seconds',
