@@ -62,7 +62,7 @@ def login():
             metrics.LOGIN_COUNTER.labels(
                 service='usermanager',
                 node=run.NODE_NAME,
-                reason=fail_reason  #
+                resource=fail_reason  #
             ).inc(1)
 
 

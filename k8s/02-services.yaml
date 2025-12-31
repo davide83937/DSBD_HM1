@@ -35,6 +35,7 @@ spec:
           ports:
             - containerPort: 5000
             - containerPort: 50051
+            - containerPort: 9999
           env:
             - name: DB_HOST
               value: "mysql-service"
