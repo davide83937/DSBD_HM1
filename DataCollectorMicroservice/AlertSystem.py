@@ -1,5 +1,4 @@
 import kafka_services as k
-import threading
 import time
 import DatabaseManager as db
 
@@ -13,7 +12,7 @@ producer = k.create_producer()
 def background_timestamp_update():
   try:
     while True:
-        print("DEBUG: Alert System in attesa di messaggi...", flush=True)  # AGGIUNGI QUESTA
+        print("DEBUG: Alert System in attesa di messaggi...", flush=True)
         result = k.check_message_kafka(consumer, NAME)
         if result:
             print(f"Messaggio ricevuto! Controllo voli per l'aeroporto...", flush=True)

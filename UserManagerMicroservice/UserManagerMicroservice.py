@@ -6,6 +6,9 @@ import DbManager as db
 import grpc_methods
 import service_pb2
 import redis_script as rs
+import metrics
+import time
+import run
 
 app = Blueprint('app', __name__)
 
@@ -17,7 +20,11 @@ def sha256_hash(s: str) -> str:
 
 @app.route("/login", methods=["POST"])
 def login():
+    success = False
+    fail_reason = "unknown_error"
     try:
+        start_chiamata = time.perf_counter()
+        valore = 0
         data = request.json
         email = data["email"]
         password = data["password"]
@@ -26,22 +33,39 @@ def login():
         if response == 1:
             response = db.login(email, password, True)
             if response == 0:
+                valore = time.perf_counter() - start_chiamata
+                success = True
                 return {"message": "Login effettuato con successo"}, 200
             elif response == 2:
+                fail_reason = "already_logged"
                 return {"message": "Utente gia loggato"}, 407
             elif response == -1:
+                fail_reason = "db_internal_error"
                 return {"message": "Qualcosa è andato storto"}, 404
             elif response == 1:
+                fail_reason = "wrong_credentials"
                 return {"message": "Qualcosa è andato storto"}, 409
         else:
+            fail_reason = "user_not_found"
             return {"message": "L'utente non esiste"}, 408
     except grpc.RpcError as e:
+       fail_reason = "grpc_error"
        e = e.code()
        if e == grpc.StatusCode.UNAVAILABLE:
          return {"message": f"Il canale grpc è spento o irraggiungibile: {e}"}, 503
     except KeyError as e:
+        fail_reason = "missing_input"
         campo_mancante = e.args[0]
         return {"error": f"Manca il campo obbligatorio: {campo_mancante}"}, 400
+    finally:
+        if not success:
+            metrics.LOGIN_COUNTER.labels(
+                service='usermanager',
+                node=run.NODE_NAME,
+                reason=fail_reason  #
+            ).inc(1)
+
+
 
 
 
