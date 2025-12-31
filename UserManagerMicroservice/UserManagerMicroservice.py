@@ -70,11 +70,6 @@ def login():
                 resource=fail_reason  #
             ).inc(1)
 
-
-
-
-
-
 @app.route("/registrazione", methods=["POST"])
 def registrazione():
     try:

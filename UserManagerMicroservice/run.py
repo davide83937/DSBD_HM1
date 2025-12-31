@@ -3,10 +3,8 @@ from flask import Flask
 from UserManagerMicroservice import app
 import metrics
 
-
 appl = Flask(__name__)
 appl.register_blueprint(app)
-
 
 if __name__ == "__main__":
     prometheus_client.start_http_server(9999)
