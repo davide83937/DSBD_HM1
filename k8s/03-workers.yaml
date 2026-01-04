@@ -21,11 +21,16 @@ spec:
             - containerPort: 9999
           env:
             - name: DB_HOST
-              value: "mysql-service.default.svc.cluster.local"
+              value: "mysql-service"
             - name: PYTHONUNBUFFERED
               value: "1"
             - name: KAFKA_BOOTSTRAP_SERVERS
-              value: "kafka-service.default.svc.cluster.local:9092"
+              value: "kafka-service:9092"
+          readinessProbe:
+            tcpSocket:
+              port: 9999
+            initialDelaySeconds: 5
+            periodSeconds: 10
 
 ---
 apiVersion: apps/v1
@@ -49,4 +54,4 @@ spec:
           command: ["python", "AlertNotifierSystem.py"]
           env:
             - name: KAFKA_BOOTSTRAP_SERVERS
-              value: "kafka-service.default.svc.cluster.local:9092"
+              value: "kafka-service:9092"
