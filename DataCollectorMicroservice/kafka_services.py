@@ -87,7 +87,7 @@ def check_message_kafka(consumer, name):
                 else:
                     return decode_message(consumer, msg)
             except (json.JSONDecodeError, KeyError) as e:
-                consumer.commit(asynchronous=False)
+                consumer.commit(asynchronous=False) #A cosa serve: Questo è utile solo per scartare i messaggi corrotti. Se un messaggio non è un JSON valido, fai il commit per "saltarlo" ed evitare che il consumer rimanga bloccato per sempre sullo stesso errore al riavvio.
                 return False
     except KeyboardInterrupt:
         return False

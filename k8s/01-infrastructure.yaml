@@ -53,8 +53,7 @@ spec:
                 secretKeyRef:
                   name: app-secrets
                   key: DB_ROOT_PASSWORD
-            #- name: MYSQL_DATABASE
-            #  value: "UserDB"
+
             - name: MYSQL_USER
               valueFrom:
                 secretKeyRef:

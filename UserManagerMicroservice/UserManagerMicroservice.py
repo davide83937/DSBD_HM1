@@ -18,6 +18,11 @@ def sha512_hash(s: str) -> str:
 def sha256_hash(s: str) -> str:
     return hashlib.sha3_256(s.encode()).hexdigest()
 
+
+@app.route("/", methods=["GET"])
+def health_check():
+    return {"status": "OK"}, 200
+
 @app.route("/login", methods=["POST"])
 def login():
     success = False

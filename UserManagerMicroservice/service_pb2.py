@@ -4,6 +4,29 @@
 # source: service.proto
 # Protobuf Python Version: 6.31.1
 """Generated protocol buffer code."""
+
+"""
+1. service.proto (La Definizione)
+È il file sorgente scritto in IDL (Interface Definition Language). Qui definisci "cosa" il servizio può fare 
+(i metodi checkUser o delete_interestes_by_email) e "quali" dati scambiare.
+
+2. service_pb2.py (L'interfaccia dei Dati)
+Questo file viene generato dal compilatore protoc e contiene le classi Python corrispondenti ai messaggi definiti 
+nel .proto (come UserCheckMessage o UserResponse).
+
+A cosa serve: Fornisce i metodi per serializzare e leggere i dati in formato binario (Protocol Buffers). 
+Senza questo file, il tuo codice non saprebbe come "impacchettare" le informazioni da spedire sulla rete.
+
+3. service_pb2_grpc.py (L'interfaccia di Comunicazione)
+Anche questo è generato automaticamente e contiene la logica per la chiamata remota vera e propria.
+
+Lo Stub (Client): Fornisce l'oggetto locale che il client chiama come se fosse una funzione normale. 
+Quando chiami un metodo sullo stub, questo file si occupa di inviare la richiesta al server.
+
+Il Servicer (Server): Fornisce la classe base (lo "scheletro") che il server deve ereditare e implementare 
+per rispondere alle chiamate.
+"""
+
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import descriptor_pool as _descriptor_pool
 from google.protobuf import runtime_version as _runtime_version
